@@ -132,7 +132,7 @@ const PriceMonitor = () => {
                 const promises = dates.map(async (date, index) => {
                     try {
                         const response = await axios.get(`/api-bapanas/api/front/harga-pangan-informasi?province_id=&city_id=&level_harga_id=3&date=${date}`, {
-                            timeout: 5000 // Short timeout for low connection
+                            timeout: 15000 // Increased timeout for slow government API
                         });
 
                         if (response.data && response.data.status === 'success') {
@@ -158,6 +158,8 @@ const PriceMonitor = () => {
                         }
                     } catch (e) {
                         console.warn(`Failed to fetch data for ${date}`, e);
+                        // Save last error code if all fail
+                        if (!latestUpdateStr) latestUpdateStr = `Err: ${e.message}`;
                     }
                 });
 
@@ -167,15 +169,16 @@ const PriceMonitor = () => {
                 if (latestPrices.length > 0) {
                     setPrices(latestPrices);
                     setHistoryData(historyTemp);
-                    if (latestUpdateStr) setLastUpdate(latestUpdateStr);
+                    if (latestUpdateStr && !latestUpdateStr.startsWith('Err:')) setLastUpdate(latestUpdateStr);
 
                     localStorage.setItem('prices', JSON.stringify(latestPrices));
                     localStorage.setItem('historyData', JSON.stringify(historyTemp));
-                    if (latestUpdateStr) localStorage.setItem('lastUpdate', latestUpdateStr);
+                    if (latestUpdateStr && !latestUpdateStr.startsWith('Err:')) localStorage.setItem('lastUpdate', latestUpdateStr);
                     setError(null);
                 } else if (!cachedPrices) {
                     // Only error if we have no cache and no new data
-                    setError('Gagal memuat harga pasar. Periksa koneksi internet Anda.');
+                    const errorDetail = latestUpdateStr.startsWith('Err:') ? latestUpdateStr : 'Data kosong';
+                    setError(`Gagal memuat harga pasar (${errorDetail}). Pastikan netlify.toml sudah masuk ke GitHub.`);
                 }
             } catch (err) {
                 console.error('Error fetching all price data:', err);
