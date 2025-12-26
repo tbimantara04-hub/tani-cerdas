@@ -1,0 +1,10 @@
+[[redirects]]
+  from = "/api-bapanas/*"
+  to = "https://api-panelhargav2.badanpangan.go.id/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
