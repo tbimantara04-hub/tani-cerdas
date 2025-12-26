@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
+:root {
+  --primary: #2D5A27; /* Deep Green */
+  --secondary: #F4B41A; /* Harvest Yellow */
+  --accent: #E8F5E9; /* Light Mint */
+  --text: #1B3320; /* Dark Green Text */
+  --bg: #FFFFFF;
+  --card-bg: #F9FDF9;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  font-size: 18px; /* Larger base font for readability */
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  padding-bottom: 100px; /* Space for bottom nav */
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--accent);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 20px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: transform 0.2s;
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.nav-item.active {
+  color: var(--primary);
+}
+
+.nav-item span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Icons */
+.icon-large {
+  width: 32px;
+  height: 32px;
+}
+
+/* Utilities */
+.text-center { text-align: center; }
+.mt-2 { margin-top: 10px; }
+.mb-2 { margin-bottom: 10px; }
+.mb-4 { margin-bottom: 20px; }
