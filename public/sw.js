@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tani-cerdas-v1';
+const CACHE_NAME = 'tani-cerdas-v2';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
