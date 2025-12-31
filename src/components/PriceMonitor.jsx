@@ -177,8 +177,12 @@ const PriceMonitor = () => {
                     setError(null);
                 } else if (!cachedPrices) {
                     // Only error if we have no cache and no new data
-                    const errorDetail = latestUpdateStr.startsWith('Err:') ? latestUpdateStr : 'Data kosong';
-                    setError(`Gagal memuat harga pasar (${errorDetail}). Pastikan netlify.toml sudah masuk ke GitHub.`);
+                    const errorDetail = latestUpdateStr.startsWith('Err:') ? latestUpdateStr : 'Data tidak tersedia';
+                    if (errorDetail.includes('500')) {
+                        setError(`Server BAPANAS sedang mengalami gangguan (Err 500). Mohon coba lagi nanti.`);
+                    } else {
+                        setError(`Gagal memuat harga pasar (${errorDetail}). Pastikan koneksi internet stabil atau cek konfigurasi netlify.toml.`);
+                    }
                 }
             } catch (err) {
                 console.error('Error fetching all price data:', err);
