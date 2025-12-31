@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cloud, BookOpen, Scaling as Tag, Menu, Home } from 'lucide-react';
+import { Cloud, BookOpen, Scale as Tag, Menu, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Weather from './components/Weather';
 import Info from './components/Info';
@@ -45,22 +45,22 @@ function App() {
       </main>
 
       <nav className="bottom-nav">
-        <div 
-          className={`nav-item ${activeTab === 'cuaca' ? 'active' : ''}`} 
+        <div
+          className={`nav-item ${activeTab === 'cuaca' ? 'active' : ''}`}
           onClick={() => setActiveTab('cuaca')}
         >
           <Cloud className="icon-large" />
           <span>Cuaca</span>
         </div>
-        <div 
-          className={`nav-item ${activeTab === 'info' ? 'active' : ''}`} 
+        <div
+          className={`nav-item ${activeTab === 'info' ? 'active' : ''}`}
           onClick={() => setActiveTab('info')}
         >
           <BookOpen className="icon-large" />
           <span>Informasi</span>
         </div>
-        <div 
-          className={`nav-item ${activeTab === 'harga' ? 'active' : ''}`} 
+        <div
+          className={`nav-item ${activeTab === 'harga' ? 'active' : ''}`}
           onClick={() => setActiveTab('harga')}
         >
           <Tag className="icon-large" />

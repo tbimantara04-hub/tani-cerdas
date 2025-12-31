@@ -11,7 +11,9 @@ export default defineConfig({
         changeOrigin: true,
         headers: {
           'Origin': 'https://panelharga.badanpangan.go.id',
-          'Referer': 'https://panelharga.badanpangan.go.id/'
+          'Referer': 'https://panelharga.badanpangan.go.id/',
+          'Accept': 'application/json',
+          'x-api-key': '***REMOVED***'
         },
         rewrite: (path) => path.replace(/^\/api-bapanas/, '')
       }
