@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sprout, Shovel, Timer, PackageCheck, ChevronRight, X, Wheat, Flame, Leaf } from 'lucide-react';
+import { Sprout, Shovel, Timer, PackageCheck, ChevronRight, X, Wheat, Flame, Leaf, Bug } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Data untuk jenis-jenis tanaman pada Pilih Bibit
@@ -133,6 +133,38 @@ const infoData = [
                 <p className="mb-2 text-sm text-gray-700">Segera keringkan hasil panen (padi/jagung) hingga kadar air aman (14%). Simpan di tempat kering dan berventilasi.</p>
                 <h4 className="font-bold mb-2">Tips Pemasaran</h4>
                 <p className="text-sm text-gray-700">Bersihkan hasil panen dari kotoran sebelum dijual. Kelompokkan berdasarkan ukuran (grading) untuk harga jual yang lebih baik. Cek harga pasar di tab 'Harga' sebelum menjual.</p>
+            </div>
+        )
+    },
+    {
+        id: 5,
+        icon: Bug,
+        title: "Pengendalian OPT",
+        desc: "Upaya mengendalikan hama & penyakit.",
+        color: "#DC2626",
+        details: (
+            <div>
+                <h4 className="font-bold mb-2">Prinsip PHT (Pengendalian Hama Terpadu)</h4>
+                <p className="mb-3 text-sm text-gray-700">Mengutamakan metode alami sebelum menggunakan pestisida kimia untuk menjaga ekosistem.</p>
+
+                <h4 className="font-bold mb-1">1. Pengendalian Fisik & Mekanik</h4>
+                <p className="mb-3 text-sm text-gray-700">Mencabut bagian tanaman yang sakit, memasang perangkap kuning (yellow trap), dan memasang ajir/mulsa.</p>
+
+                <h4 className="font-bold mb-1">2. Pengendalian Hayati</h4>
+                <p className="mb-3 text-sm text-gray-700">Memanfaatkan musuh alami seperti laba-laba, atau penggunaan agensia hayati (jamur Beauveria bassiana).</p>
+
+                <h4 className="font-bold mb-1">3. Pengendalian Kimiawi (Langkah Terakhir)</h4>
+                <p className="mb-4 text-sm text-gray-700">Gunakan pestisida secara bijaksana dengan prinsip 6 Tepat: Tepat sasaran, jenis, dosis, cara, waktu, dan mutu.</p>
+
+                <div className="bg-red-50 p-3 rounded-lg border border-red-100">
+                    <h4 className="font-bold text-red-800 mb-2 text-sm">Hama Utama Tanaman:</h4>
+                    <ul className="text-xs text-red-700 space-y-1">
+                        <li><strong>🌾 Padi:</strong> Wereng, Tikus, Penggerek Batang.</li>
+                        <li><strong>🌽 Jagung:</strong> Ulat Grayak (FAW), Penyakit Bule.</li>
+                        <li><strong>🌶️ Cabai:</strong> Antraknosa (Patek), Virus Kuning.</li>
+                        <li><strong>🧅 Bawang:</strong> Ulat Bawang, Penyakit Moler.</li>
+                    </ul>
+                </div>
             </div>
         )
     }
