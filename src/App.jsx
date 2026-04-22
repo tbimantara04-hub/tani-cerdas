@@ -4,18 +4,34 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Weather from './components/Weather';
 import Info from './components/Info';
 import PriceMonitor from './components/PriceMonitor';
+import VoiceAssistant from './components/VoiceAssistant';
+import Chatbot from './components/Chatbot';
+import FarmerProfile from './components/FarmerProfile';
+import { User } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState('cuaca');
+  const [priceSubTab, setPriceSubTab] = useState('pangan');
+  const [infoCategory, setInfoCategory] = useState(null);
+  const [selectedPlant, setSelectedPlant] = useState(null);
 
   const renderContent = () => {
     switch (activeTab) {
       case 'cuaca':
         return <Weather />;
       case 'info':
-        return <Info />;
+        return (
+          <Info
+            activeCategory={infoCategory}
+            onCategoryChange={setInfoCategory}
+            activePlant={selectedPlant}
+            onPlantChange={setSelectedPlant}
+          />
+        );
       case 'harga':
-        return <PriceMonitor />;
+        return <PriceMonitor activeSubTab={priceSubTab} onSubTabChange={setPriceSubTab} />;
+      case 'profil':
+        return <FarmerProfile />;
       default:
         return <Weather />;
     }
@@ -42,6 +58,16 @@ function App() {
             {renderContent()}
           </motion.div>
         </AnimatePresence>
+
+        <VoiceAssistant
+          activeTab={activeTab}
+          onNavigate={setActiveTab}
+          onPriceTabChange={setPriceSubTab}
+          onInfoCategoryChange={setInfoCategory}
+          infoCategory={infoCategory}
+          selectedPlant={selectedPlant}
+        />
+        <Chatbot />
       </main>
 
       <nav className="bottom-nav">
@@ -65,6 +91,13 @@ function App() {
         >
           <Tag className="icon-large" />
           <span>Harga</span>
+        </div>
+        <div
+          className={`nav-item ${activeTab === 'profil' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profil')}
+        >
+          <User className="icon-large" />
+          <span>Profil</span>
         </div>
       </nav>
     </div>

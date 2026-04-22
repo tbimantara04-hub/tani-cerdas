@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowchart Render</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    <style>
+        body {
+            background-color: white;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #graphDiv {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mermaid" id="graphDiv">
+        graph TD
+        Start([Buka Aplikasi]) --> Home[Halaman Utama / Cuaca]
+
+        %% Visual Input Flow
+        Home -->|Input Visual| VisualSelect{Pilih Menu}
+        VisualSelect -->|Klik Tab Cuaca| FeatCuaca[Fitur: Info Cuaca]
+        VisualSelect -->|Klik Tab Informasi| FeatInfo[Fitur: Edukasi Pertanian]
+        VisualSelect -->|Klik Tab Harga| FeatHarga[Fitur: Monitor Harga]
+
+        FeatInfo -->|Pilih Kategori| InfoDetail[Detail Informasi]
+        FeatHarga -->|Toggle Tab| SwitchHarga{Pilih Tipe}
+        SwitchHarga -->|Pangan| HargaPangan[Harga Pangan]
+        SwitchHarga -->|Pupuk| HargaPupuk[Harga Pupuk]
+
+        %% Voice Input Flow
+        Home -->|Input Suara| VoiceStart[Klik Ikon Mikrofon]
+        VoiceStart --> VoiceListen(Mendengarkan Perintah...)
+        VoiceListen --> VoiceProcess{Proses Perintah}
+
+        VoiceProcess -->|'Cek Cuaca'| ActionCuaca[Navigasi ke Cuaca + TTS Info]
+        VoiceProcess -->|'Info Padi/Jagung'| ActionInfo[Navigasi ke Info + TTS Detail]
+        VoiceProcess -->|'Cek Harga'| ActionHarga[Navigasi ke Harga + TTS Data]
+        VoiceProcess -->|Tidak Dikenali| VoiceError[Feedback Suara: Maaf tidak mengerti]
+
+        %% Convergence
+        ActionCuaca --> FeatCuaca
+        ActionInfo --> InfoDetail
+        ActionHarga --> FeatHarga
+        VoiceError --> VoiceStart
+    </div>
+</body>
+
+</html>

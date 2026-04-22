@@ -1,178 +1,13 @@
 import React, { useState } from 'react';
-import { Sprout, Shovel, Timer, PackageCheck, ChevronRight, X, Wheat, Flame, Leaf, Bug } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Data untuk jenis-jenis tanaman pada Pilih Bibit
-const plantTypes = [
-    {
-        id: 'padi',
-        name: 'Padi',
-        icon: Wheat,
-        emoji: '🌾',
-        color: '#8B7355',
-        details: {
-            title: 'Pemilihan Bibit Padi',
-            tips: [
-                'Pilih benih bersertifikat (label biru untuk benih sebar atau ungu untuk benih inti)',
-                'Pastikan benih bernas (berisi penuh), tidak keriput, dan bersih dari kotoran',
-                'Lakukan uji apung: rendam benih dalam air garam, pilih yang tenggelam',
-                'Perhatikan tanggal kedaluwarsa dan masa penyimpanan benih',
-                'Gunakan varietas unggul sesuai musim dan ketinggian lahan'
-            ]
-        }
-    },
-    {
-        id: 'jagung',
-        name: 'Jagung',
-        icon: Sprout,
-        emoji: '🌽',
-        color: '#FFA500',
-        details: {
-            title: 'Pemilihan Bibit Jagung',
-            tips: [
-                'Pilih benih hibrida atau komposit bersertifikat',
-                'Pastikan biji berukuran seragam, mengkilap, dan tidak keriput',
-                'Periksa daya kecambah minimal 90%',
-                'Simpan benih di tempat sejuk dan kering',
-                'Gunakan varietas tahan wereng dan penyakit bulai'
-            ]
-        }
-    },
-    {
-        id: 'cabai',
-        name: 'Cabai',
-        icon: Flame,
-        emoji: '🌶️',
-        color: '#DC2626',
-        details: {
-            title: 'Pemilihan Bibit Cabai',
-            tips: [
-                'Pilih biji dari buah yang tua, matang sempurna, dan sehat',
-                'Keringkan biji hingga kadar air sekitar 8-10%',
-                'Pilih varietas sesuai permintaan pasar (cabai merah/rawit)',
-                'Semai benih di polybag kecil atau tray semai',
-                'Rendam benih dengan air hangat (50°C) selama 3-4 jam sebelum semai'
-            ]
-        }
-    },
-    {
-        id: 'bawang',
-        name: 'Bawang',
-        icon: Leaf,
-        emoji: '🧅',
-        color: '#9333EA',
-        details: {
-            title: 'Pemilihan Bibit Bawang',
-            tips: [
-                'Gunakan umbi yang sudah disimpan 2-3 bulan (dorman)',
-                'Pilih umbi yang sehat, padat, tidak busuk atau berlubang',
-                'Ukuran umbi sebaiknya seragam (diameter 1.5-2.5 cm)',
-                'Tunas sudah mulai muncul sedikit (tanda siap tanam)',
-                'Untuk bawang daun, bisa juga menggunakan biji'
-            ]
-        }
-    }
-];
-
-const infoData = [
-    {
-        id: 1,
-        icon: Sprout,
-        title: "Pilih Bibit",
-        desc: "Cara memilih bibit unggul dan sehat.",
-        color: "#2D5A27",
-        hasSubCategories: true,
-        plantTypes: plantTypes
-    },
-    {
-        id: 2,
-        icon: Shovel,
-        title: "Penanaman",
-        desc: "Langkah menanam agar cepat tumbuh.",
-        color: "#2D5A27",
-        details: (
-            <div>
-                <h4 className="font-bold mb-2">Persiapan Lahan</h4>
-                <p className="mb-2 text-sm text-gray-700">Gemburkan tanah dan beri pupuk kandang 1 minggu sebelum tanam. Pastikan sistem irigasi lancar.</p>
-                <h4 className="font-bold mb-2">Jarak Tanam</h4>
-                <ul className="list-disc pl-4 text-sm text-gray-700">
-                    <li>Padi: Sistem jajar legowo (2:1 atau 4:1) untuk hasil lebih tinggi.</li>
-                    <li>Jagung: 70cm x 20cm, 1 biji per lubang.</li>
-                    <li>Cabai: 50cm x 60cm, gunakan mulsa plastik.</li>
-                </ul>
-            </div>
-        )
-    },
-    {
-        id: 3,
-        icon: Timer,
-        title: "Waktu Panen",
-        desc: "Tanda-tanda tanaman siap dipetik.",
-        color: "#F4B41A",
-        details: (
-            <div>
-                <h4 className="font-bold mb-2">Ciri Siap Panen</h4>
-                <ul className="list-disc pl-4 text-sm text-gray-700">
-                    <li><strong>Padi:</strong> 95% butir sudah menguning, daun bendera mulai kering.</li>
-                    <li><strong>Jagung:</strong> Kelobot kering/coklat, biji mengkilap dan keras bila ditekan kuku.</li>
-                    <li><strong>Cabai:</strong> 60-80% warna merah merata (untuk cabai merah).</li>
-                    <li><strong>Bawang:</strong> Leher batang lunak dan 60% daun menguning/rebah.</li>
-                </ul>
-            </div>
-        )
-    },
-    {
-        id: 4,
-        icon: PackageCheck,
-        title: "Olahan Panen",
-        desc: "Menjaga hasil panen tetap segar.",
-        color: "#F4B41A",
-        details: (
-            <div>
-                <h4 className="font-bold mb-2">Pasca Panen</h4>
-                <p className="mb-2 text-sm text-gray-700">Segera keringkan hasil panen (padi/jagung) hingga kadar air aman (14%). Simpan di tempat kering dan berventilasi.</p>
-                <h4 className="font-bold mb-2">Tips Pemasaran</h4>
-                <p className="text-sm text-gray-700">Bersihkan hasil panen dari kotoran sebelum dijual. Kelompokkan berdasarkan ukuran (grading) untuk harga jual yang lebih baik. Cek harga pasar di tab 'Harga' sebelum menjual.</p>
-            </div>
-        )
-    },
-    {
-        id: 5,
-        icon: Bug,
-        title: "Pengendalian OPT",
-        desc: "Upaya mengendalikan hama & penyakit.",
-        color: "#DC2626",
-        details: (
-            <div>
-                <h4 className="font-bold mb-2">Prinsip PHT (Pengendalian Hama Terpadu)</h4>
-                <p className="mb-3 text-sm text-gray-700">Mengutamakan metode alami sebelum menggunakan pestisida kimia untuk menjaga ekosistem.</p>
-
-                <h4 className="font-bold mb-1">1. Pengendalian Fisik & Mekanik</h4>
-                <p className="mb-3 text-sm text-gray-700">Mencabut bagian tanaman yang sakit, memasang perangkap kuning (yellow trap), dan memasang ajir/mulsa.</p>
-
-                <h4 className="font-bold mb-1">2. Pengendalian Hayati</h4>
-                <p className="mb-3 text-sm text-gray-700">Memanfaatkan musuh alami seperti laba-laba, atau penggunaan agensia hayati (jamur Beauveria bassiana).</p>
-
-                <h4 className="font-bold mb-1">3. Pengendalian Kimiawi (Langkah Terakhir)</h4>
-                <p className="mb-4 text-sm text-gray-700">Gunakan pestisida secara bijaksana dengan prinsip 6 Tepat: Tepat sasaran, jenis, dosis, cara, waktu, dan mutu.</p>
-
-                <div className="bg-red-50 p-3 rounded-lg border border-red-100">
-                    <h4 className="font-bold text-red-800 mb-2 text-sm">Hama Utama Tanaman:</h4>
-                    <ul className="text-xs text-red-700 space-y-1">
-                        <li><strong>🌾 Padi:</strong> Wereng, Tikus, Penggerek Batang.</li>
-                        <li><strong>🌽 Jagung:</strong> Ulat Grayak (FAW), Penyakit Bule.</li>
-                        <li><strong>🌶️ Cabai:</strong> Antraknosa (Patek), Virus Kuning.</li>
-                        <li><strong>🧅 Bawang:</strong> Ulat Bawang, Penyakit Moler.</li>
-                    </ul>
-                </div>
-            </div>
-        )
-    }
-];
+import { plantTypes, infoData } from '../data/agriculturalData';
 
 // Component untuk card jenis tanaman
-const PlantTypeCard = ({ plant, onClick }) => {
+const PlantTypeCard = ({ plant, category, onClick }) => {
     const Icon = plant.icon;
+    const categoryName = infoData.find(item => item.categoryKey === category)?.title || 'Informasi';
+
     return (
         <div
             className="card"
@@ -213,7 +48,7 @@ const PlantTypeCard = ({ plant, onClick }) => {
                     {plant.emoji} {plant.name}
                 </h3>
                 <p style={{ fontSize: '13px', color: '#666' }}>
-                    Tips memilih bibit {plant.name.toLowerCase()}
+                    Tips {categoryName.toLowerCase()} {plant.name.toLowerCase()}
                 </p>
             </div>
             <ChevronRight size={20} color="#ccc" />
@@ -222,9 +57,10 @@ const PlantTypeCard = ({ plant, onClick }) => {
 };
 
 // Component untuk detail jenis tanaman
-const PlantTypeDetail = ({ plant, onClose, onBack }) => {
-    if (!plant) return null;
+const PlantTypeDetail = ({ plant, category, onClose, onBack }) => {
+    if (!plant || !category) return null;
     const Icon = plant.icon;
+    const categoryData = plant.data[category];
 
     return (
         <motion.div
@@ -248,7 +84,7 @@ const PlantTypeDetail = ({ plant, onClose, onBack }) => {
                 <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 0 }}>
                     <X size={28} color="#333" />
                 </button>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>{plant.details.title}</h3>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>{categoryData.title}</h3>
                 <div style={{ width: '28px' }}></div>
             </div>
 
@@ -268,16 +104,17 @@ const PlantTypeDetail = ({ plant, onClose, onBack }) => {
             </div>
 
             <div style={{
-                backgroundColor: '#F9FAFB',
+                backgroundColor: category === 'opt' ? '#FFF5F5' : '#F9FAFB',
                 padding: '20px',
                 borderRadius: '16px',
-                marginBottom: '16px'
+                marginBottom: '16px',
+                border: category === 'opt' ? '1px solid #FED7D7' : 'none'
             }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#333' }}>
-                    Tips Memilih Bibit:
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: category === 'opt' ? '#C53030' : '#333' }}>
+                    Panduan & Tips:
                 </h4>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {plant.details.tips.map((tip, index) => (
+                    {categoryData.tips.map((tip, index) => (
                         <li key={index} style={{
                             fontSize: '14px',
                             lineHeight: '1.6',
@@ -290,20 +127,41 @@ const PlantTypeDetail = ({ plant, onClose, onBack }) => {
                                 position: 'absolute',
                                 left: 0,
                                 top: 0,
-                                color: plant.color,
+                                color: category === 'opt' ? '#E53E3E' : plant.color,
                                 fontWeight: 'bold'
-                            }}>✓</span>
+                            }}>{category === 'opt' ? '!' : '✓'}</span>
                             {tip}
                         </li>
                     ))}
                 </ul>
             </div>
+
+            <button
+                onClick={onBack}
+                style={{
+                    width: '100%',
+                    padding: '16px',
+                    backgroundColor: plant.color,
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    marginTop: '8px'
+                }}
+            >
+                Kembali ke Daftar
+            </button>
         </motion.div>
     );
 };
 
 // Component untuk menampilkan daftar jenis tanaman
-const PlantTypeList = ({ onClose, onSelectPlant }) => {
+const PlantTypeList = ({ category, onClose, onSelectPlant }) => {
+    const categoryInfo = infoData.find(item => item.categoryKey === category);
+    if (!categoryInfo) return null;
+    const CategoryIcon = categoryInfo.icon;
+
     return (
         <motion.div
             initial={{ y: "100%" }}
@@ -332,131 +190,105 @@ const PlantTypeList = ({ onClose, onSelectPlant }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
                 <div style={{
-                    backgroundColor: '#2D5A27',
+                    backgroundColor: categoryInfo.color,
                     padding: '20px',
                     borderRadius: '50%',
                     color: 'white',
                     marginBottom: '16px',
-                    boxShadow: '0 6px 16px rgba(45,90,39,0.3)'
+                    boxShadow: `0 6px 16px ${categoryInfo.color}4D`
                 }}>
-                    <Sprout size={40} />
+                    <CategoryIcon size={40} />
                 </div>
-                <h2 style={{ fontSize: '24px', color: '#333', marginBottom: '8px' }}>Pilih Bibit Unggul</h2>
+                <h2 style={{ fontSize: '24px', color: '#333', marginBottom: '8px' }}>{categoryInfo.title}</h2>
                 <p style={{ fontSize: '14px', color: '#666', textAlign: 'center' }}>
-                    Pilih jenis tanaman untuk melihat tips pemilihan bibit
+                    Pilih jenis tanaman untuk melihat panduan {categoryInfo.title.toLowerCase()}
                 </p>
             </div>
 
             <div>
                 {plantTypes.map((plant) => (
-                    <PlantTypeCard key={plant.id} plant={plant} onClick={onSelectPlant} />
+                    <PlantTypeCard
+                        key={plant.id}
+                        plant={plant}
+                        category={category}
+                        onClick={onSelectPlant}
+                    />
                 ))}
             </div>
         </motion.div>
     );
 };
 
+// Component untuk card informasi utama
 const InfoCard = ({ item, onClick }) => {
     const Icon = item.icon;
     return (
         <div
             className="card"
-            style={{ display: 'flex', alignItems: 'center', gap: '20px', cursor: 'pointer', marginBottom: '16px' }}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                cursor: 'pointer',
+                marginBottom: '16px',
+                padding: '20px'
+            }}
             onClick={() => onClick(item)}
         >
             <div style={{
                 backgroundColor: item.color,
-                padding: '15px',
-                borderRadius: '20px',
+                padding: '12px',
+                borderRadius: '12px',
                 color: 'white'
             }}>
-                <Icon size={32} />
+                <Icon size={24} />
             </div>
             <div style={{ flex: 1 }}>
-                <h3 style={{ fontSize: '20px', marginBottom: '4px' }}>{item.title}</h3>
-                <p style={{ fontSize: '14px', color: '#666' }}>{item.desc}</p>
+                <h3 style={{ fontSize: '16px', marginBottom: '4px' }}>{item.title}</h3>
+                <p style={{ fontSize: '13px', color: '#666' }}>{item.desc}</p>
             </div>
-            <ChevronRight size={24} color="#ccc" />
+            <ChevronRight size={20} color="#ccc" />
         </div>
     );
 };
 
-const InfoDetail = ({ item, onClose }) => {
-    if (!item) return null;
-    const Icon = item.icon;
+const Info = ({ activeCategory, onCategoryChange, activePlant, onPlantChange }) => {
+    const [internalCategory, setInternalCategory] = useState(null);
+    const selectedCategory = onCategoryChange ? activeCategory : internalCategory;
 
-    return (
-        <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'white',
-                zIndex: 50,
-                padding: '24px',
-                overflowY: 'auto'
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                <button onClick={onClose} style={{ background: 'none', border: 'none', padding: 0 }}>
-                    <X size={28} color="#333" />
-                </button>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>Detail Informasi</h3>
-                <div style={{ width: '28px' }}></div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
-                <div style={{
-                    backgroundColor: item.color,
-                    padding: '24px',
-                    borderRadius: '50%',
-                    color: 'white',
-                    marginBottom: '16px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                }}>
-                    <Icon size={48} />
-                </div>
-                <h2 style={{ fontSize: '28px', color: '#333', margin: 0 }}>{item.title}</h2>
-            </div>
-
-            <div style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>
-                {item.details}
-            </div>
-        </motion.div>
-    );
-};
-
-
-const Info = () => {
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [showPlantTypes, setShowPlantTypes] = useState(false);
-    const [selectedPlant, setSelectedPlant] = useState(null);
+    const [internalPlant, setInternalPlant] = useState(null);
+    const selectedPlant = onPlantChange ? activePlant : internalPlant;
 
     const handleCardClick = (item) => {
-        if (item.hasSubCategories) {
-            setShowPlantTypes(true);
+        if (onCategoryChange) {
+            onCategoryChange(item.categoryKey);
         } else {
-            setSelectedItem(item);
+            setInternalCategory(item.categoryKey);
         }
     };
 
     const handleClosePlantTypes = () => {
-        setShowPlantTypes(false);
+        if (onCategoryChange) {
+            onCategoryChange(null);
+        } else {
+            setInternalCategory(null);
+        }
     };
 
     const handleSelectPlant = (plant) => {
-        setSelectedPlant(plant);
+        if (onPlantChange) {
+            onPlantChange(plant);
+        } else {
+            setInternalPlant(plant);
+        }
     };
 
     const handleClosePlantDetail = () => {
-        setSelectedPlant(null);
-        setShowPlantTypes(false);
+        if (onPlantChange) {
+            onPlantChange(null);
+        } else {
+            setInternalPlant(null);
+        }
     };
 
     return (
@@ -468,14 +300,12 @@ const Info = () => {
             ))}
 
             <AnimatePresence>
-                {selectedItem && (
-                    <InfoDetail item={selectedItem} onClose={() => setSelectedItem(null)} />
-                )}
-            </AnimatePresence>
-
-            <AnimatePresence>
-                {showPlantTypes && !selectedPlant && (
-                    <PlantTypeList onClose={handleClosePlantTypes} onSelectPlant={handleSelectPlant} />
+                {selectedCategory && !selectedPlant && (
+                    <PlantTypeList
+                        category={selectedCategory}
+                        onClose={handleClosePlantTypes}
+                        onSelectPlant={handleSelectPlant}
+                    />
                 )}
             </AnimatePresence>
 
@@ -483,8 +313,9 @@ const Info = () => {
                 {selectedPlant && (
                     <PlantTypeDetail
                         plant={selectedPlant}
+                        category={selectedCategory}
                         onClose={handleClosePlantDetail}
-                        onBack={() => setSelectedPlant(null)}
+                        onBack={handleClosePlantDetail}
                     />
                 )}
             </AnimatePresence>

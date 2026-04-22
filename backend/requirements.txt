@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+langchain
+langchain-community
+langchain-google-genai
+pypdf
+faiss-cpu
+python-dotenv
+google-generativeai
+cryptography==42.0.5

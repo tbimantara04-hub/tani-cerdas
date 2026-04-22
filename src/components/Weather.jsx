@@ -8,21 +8,24 @@ const Weather = () => {
     const [loading, setLoading] = useState(true);
 
     const API_KEY = "***REMOVED***";
-    const CITY = "Jakarta";
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (lat, lon, cityName) => {
             try {
+                let currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric&lang=id`;
+                let forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${API_KEY}&units=metric&lang=id`;
+                
+                if (lat && lon) {
+                    currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=id`;
+                    forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=id`;
+                }
+
                 // Fetch Current Weather
-                const currentRes = await axios.get(
-                    `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric&lang=id`
-                );
+                const currentRes = await axios.get(currentUrl);
                 setCurrent(currentRes.data);
 
                 // Fetch 5-day Forecast
-                const forecastRes = await axios.get(
-                    `https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&appid=${API_KEY}&units=metric&lang=id`
-                );
+                const forecastRes = await axios.get(forecastUrl);
 
                 // Process forecast data to get one entry per day (noon)
                 const dailyData = forecastRes.data.list.filter(item => item.dt_txt.includes("12:00:00"));
@@ -34,7 +37,7 @@ const Weather = () => {
                 setCurrent({
                     main: { temp: 28, pressure: 1012 },
                     weather: [{ description: "Cerah Berawan", main: "Clouds" }],
-                    name: "Jakarta"
+                    name: cityName || "Lokasi Anda"
                 });
                 setForecast([
                     { dt_txt: "Besok", main: { temp: 29 }, weather: [{ main: "Sun" }] },
@@ -45,7 +48,19 @@ const Weather = () => {
             }
         };
 
-        fetchData();
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchData(position.coords.latitude, position.coords.longitude, null);
+                },
+                (error) => {
+                    console.warn("Geolocation permission denied or error. Falling back to default.");
+                    fetchData(null, null, "Jakarta"); // Fallback
+                }
+            );
+        } else {
+            fetchData(null, null, "Jakarta");
+        }
     }, []);
 
     const getWeatherIcon = (main, size = 32) => {

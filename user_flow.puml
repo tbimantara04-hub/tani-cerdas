@@ -1,0 +1,99 @@
+@startuml
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam state {
+  BackgroundColor<<Voice>> LightBlue
+  BackgroundColor<<Visual>> LightGreen
+}
+
+title User Flow Tani Cerdas: Voice & Visual Interaction
+
+|User|
+start
+:Buka Aplikasi Tani Cerdas;
+
+|#AntiqueWhite|System|
+:Inisialisasi App;
+:Tampilkan **Tab Cuaca** (Default);
+:Aktifkan **Voice Assistant** (Background Listening);
+
+fork
+    |User|
+    -> **Visual Input**;
+    if (Interaksi Navigasi?) then (Menu Bawah)
+        if (Pilih Cuaca?) then (Yes)
+            :Tap Ikon **Cuaca**;
+            |System|
+            :Render Komponen **Weather**;
+            :Tampilkan Data Cuaca & Lokasi;
+        elseif (Pilih Info?) then (Yes)
+            :Tap Ikon **Informasi**;
+            |System|
+            :Render Komponen **Info**;
+            :Tampilkan Grid Kategori;
+            |User|
+            if (Pilih Kategori?) then (Ya)
+                :Klik Kategori (Mis: Padi);
+                |System|
+                :Filter Data Tanaman;
+                :Tampilkan Detail Budidaya;
+            endif
+        elseif (Pilih Harga?) then (Yes)
+            :Tap Ikon **Harga**;
+            |System|
+            :Render Komponen **PriceMonitor**;
+            :Tampilkan Harga Pangan (Default);
+            |User|
+            if (Ganti Jenis Harga?) then (Pupuk)
+                :Tap Toggle **Pupuk**;
+                |System|
+                :Switch ke Data Harga Pupuk;
+                :Tampilkan List Harga Pupuk;
+            else (Pangan)
+                :Tap Toggle **Pangan**;
+                |System|
+                :Tampilkan List Harga Pangan;
+            endif
+        endif
+    endif
+
+fork again
+    |User|
+    -> **Voice Input**;
+    :Ucapkan Perintah;
+    note right
+        Contoh:
+        "Buka menu harga"
+        "Bagaimana cara tanam jagung?"
+        "Cek harga pupuk urea"
+    end note
+    
+    |System|
+    :Voice Assistant Menerima Audio;
+    :Proses Speech-to-Text & Intent;
+    
+    if (Intent Terdeteksi?) then (Navigasi Simple)
+        :Set ActiveTab sesuai Perintah;
+    elseif (Query Informasi)
+        :Set ActiveTab = 'info';
+        :Set Kategori/Tanaman Terpilih;
+        note right
+            Misal: user bilang "Info Jagung",
+            sistem set category='corn'
+        end note
+    elseif (Query Harga)
+        :Set ActiveTab = 'harga';
+        if (Keyword "Pupuk"?) then (Ya)
+            :Set PriceSubTab = 'pupuk';
+        else
+            :Set PriceSubTab = 'pangan';
+        endif
+    endif
+end fork
+
+|System|
+:Update UI State (Tabs & Content);
+:Tampilkan Halaman Hasil;
+
+stop
+@enduml

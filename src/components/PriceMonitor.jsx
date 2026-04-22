@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, ArrowRight, Loader2, AlertCircle, Calendar } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowRight, Loader2, AlertCircle, Calendar, Sprout, ShoppingCart } from 'lucide-react';
 import axios from 'axios';
 
 const PriceHistory = ({ history }) => {
@@ -42,45 +42,81 @@ const PriceHistory = ({ history }) => {
     );
 };
 
-const PriceItem = ({ name, price, trend, unit, history }) => {
+const PriceItem = ({ name, price, trend, unit, history, isFertilizer }) => {
     const [showHistory, setShowHistory] = useState(false);
 
+    // Disable history toggle for fertilizer since data is static HET
+    const handleClick = () => {
+        if (!isFertilizer) {
+            setShowHistory(!showHistory);
+        }
+    };
+
     return (
-        <div className="card" style={{ marginBottom: '12px', cursor: 'pointer' }} onClick={() => setShowHistory(!showHistory)}>
+        <div className="card" style={{ marginBottom: '12px', cursor: isFertilizer ? 'default' : 'pointer' }} onClick={handleClick}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                     <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>{name}</p>
                     <h3 style={{ fontSize: '20px', margin: '4px 0' }}>Rp {price.toLocaleString()} <span style={{ fontSize: '14px', fontWeight: '400' }}>/{unit}</span></h3>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                    {trend === 'up' ? (
-                        <div style={{ color: '#d32f2f', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <TrendingUp size={18} />
-                            <span style={{ fontWeight: '700', fontSize: '14px' }}>Naik</span>
+                {!isFertilizer && (
+                    <div style={{ textAlign: 'right' }}>
+                        {trend === 'up' ? (
+                            <div style={{ color: '#d32f2f', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <TrendingUp size={18} />
+                                <span style={{ fontWeight: '700', fontSize: '14px' }}>Naik</span>
+                            </div>
+                        ) : trend === 'down' ? (
+                            <div style={{ color: '#388e3c', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <TrendingDown size={18} />
+                                <span style={{ fontWeight: '700', fontSize: '14px' }}>Turun</span>
+                            </div>
+                        ) : (
+                            <div style={{ color: '#666', fontSize: '14px' }}>Stabil</div>
+                        )}
+                        <p style={{ fontSize: '10px', color: '#999', margin: '2px 0 0 0' }}>Klik detail</p>
+                    </div>
+                )}
+                {isFertilizer && (
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ color: '#2D5A27', fontSize: '14px', fontWeight: '600', backgroundColor: '#e8f5e9', padding: '4px 8px', borderRadius: '6px' }}>
+                            Subsidi
                         </div>
-                    ) : trend === 'down' ? (
-                        <div style={{ color: '#388e3c', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <TrendingDown size={18} />
-                            <span style={{ fontWeight: '700', fontSize: '14px' }}>Turun</span>
-                        </div>
-                    ) : (
-                        <div style={{ color: '#666', fontSize: '14px' }}>Stabil</div>
-                    )}
-                    <p style={{ fontSize: '10px', color: '#999', margin: '2px 0 0 0' }}>Klik detail</p>
-                </div>
+                    </div>
+                )}
             </div>
-            {showHistory && <PriceHistory history={history} />}
+            {showHistory && !isFertilizer && <PriceHistory history={history} />}
         </div>
     );
 };
 
-const PriceMonitor = () => {
+const PriceMonitor = ({ activeSubTab = 'pangan', onSubTabChange }) => {
+    const [internalTab, setInternalTab] = useState('pangan');
+    const currentTab = onSubTabChange ? activeSubTab : internalTab;
+    const handleTabChange = (tab) => {
+        if (onSubTabChange) {
+            onSubTabChange(tab);
+        } else {
+            setInternalTab(tab);
+        }
+    };
     const [prices, setPrices] = useState([]);
     const [historyData, setHistoryData] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [lastUpdate, setLastUpdate] = useState('');
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+    // Depend on currentTab for any effects if needed, though data fetching is unified currently.
+
+    // Static data for Fertilizer Prices (HET)
+    const fertilizerPrices = [
+        { id: 'f1', name: 'Pupuk Urea', today: 1800, satuan: 'kg' },
+        { id: 'f2', name: 'Pupuk NPK', today: 1840, satuan: 'kg' },
+        { id: 'f3', name: 'Pupuk NPK (Kakao)', today: 2640, satuan: 'kg' },
+        { id: 'f4', name: 'Pupuk ZA', today: 1360, satuan: 'kg' },
+        { id: 'f5', name: 'Pupuk Organik', today: 640, satuan: 'kg' },
+    ];
 
     const targetCommodities = [
         "Beras Medium",
@@ -208,42 +244,130 @@ const PriceMonitor = () => {
                         </span>
                     )}
                 </div>
-                <p style={{ fontSize: '11px', color: '#666', margin: 0, textAlign: 'right' }}>
-                    Data: {lastUpdate || '...'}<br />
-                    {isOffline ? '(Data Disimpan)' : '(Terbaru)'}
-                </p>
             </div>
 
-            {loading && prices.length === 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', color: '#666' }}>
-                    <Loader2 className="animate-spin" size={32} />
-                    <p style={{ marginTop: '12px' }}>Memuat harga...</p>
-                </div>
-            ) : error && prices.length === 0 ? (
-                <div style={{ padding: '20px', backgroundColor: '#ffebee', borderRadius: '12px', color: '#c62828', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <AlertCircle size={24} />
-                    <p style={{ fontSize: '14px', margin: 0 }}>{error}</p>
-                </div>
-            ) : (
+            {/* Tab Toggle */}
+            <div style={{
+                display: 'flex',
+                backgroundColor: '#f1f1f1',
+                padding: '4px',
+                borderRadius: '12px',
+                marginBottom: '20px'
+            }}>
+                <button
+                    onClick={() => handleTabChange('pangan')}
+                    style={{
+                        flex: 1,
+                        padding: '10px',
+                        border: 'none',
+                        borderRadius: '10px',
+                        backgroundColor: currentTab === 'pangan' ? 'white' : 'transparent',
+                        color: currentTab === 'pangan' ? '#2D5A27' : '#666',
+                        fontWeight: currentTab === 'pangan' ? '700' : '500',
+                        boxShadow: currentTab === 'pangan' ? '0 2px 4px rgba(0,0,0,0.1)' : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    <ShoppingCart size={18} />
+                    Pangan
+                </button>
+                <button
+                    onClick={() => handleTabChange('pupuk')}
+                    style={{
+                        flex: 1,
+                        padding: '10px',
+                        border: 'none',
+                        borderRadius: '10px',
+                        backgroundColor: currentTab === 'pupuk' ? 'white' : 'transparent',
+                        color: currentTab === 'pupuk' ? '#2D5A27' : '#666',
+                        fontWeight: currentTab === 'pupuk' ? '700' : '500',
+                        boxShadow: currentTab === 'pupuk' ? '0 2px 4px rgba(0,0,0,0.1)' : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    <Sprout size={18} />
+                    Pupuk
+                </button>
+            </div>
+
+            {currentTab === 'pangan' ? (
+                /* Food Prices Content */
                 <>
-                    {prices.map((item) => (
+                    <p style={{ fontSize: '11px', color: '#666', margin: '0 0 12px 0', textAlign: 'right' }}>
+                        Data: {lastUpdate || '...'}<br />
+                        {isOffline ? '(Data Disimpan)' : '(Terbaru)'}
+                    </p>
+
+                    {loading && prices.length === 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', color: '#666' }}>
+                            <Loader2 className="animate-spin" size={32} />
+                            <p style={{ marginTop: '12px' }}>Memuat harga...</p>
+                        </div>
+                    ) : error && prices.length === 0 ? (
+                        <div style={{ padding: '20px', backgroundColor: '#ffebee', borderRadius: '12px', color: '#c62828', display: 'flex', gap: '10px', alignItems: 'center' }}>
+                            <AlertCircle size={24} />
+                            <p style={{ fontSize: '14px', margin: 0 }}>{error}</p>
+                        </div>
+                    ) : (
+                        <>
+                            {prices.map((item) => (
+                                <PriceItem
+                                    key={item.id}
+                                    name={item.name}
+                                    price={item.today}
+                                    trend={item.gap_change}
+                                    unit={item.satuan.split('./')[1] || 'kg'}
+                                    history={historyData[item.name] || []}
+                                    isFertilizer={false}
+                                />
+                            ))}
+                            <button className="btn-primary mt-2" onClick={() => window.open('https://panelharga.badanpangan.go.id/', '_blank')}>
+                                Lihat Semua Harga
+                                <ArrowRight size={24} />
+                            </button>
+                            <p style={{ textAlign: 'center', fontSize: '12px', color: '#888', marginTop: '12px' }}>
+                                Sumber: Badan Pangan Nasional
+                            </p>
+                        </>
+                    )}
+                </>
+            ) : (
+                /* Fertilizer Prices Content */
+                <>
+                    <p style={{ fontSize: '11px', color: '#666', margin: '0 0 12px 0', textAlign: 'right' }}>
+                        Harga Eceran Tertinggi (HET)<br />
+                        Data Terbaru 2026
+                    </p>
+
+                    <div style={{ backgroundColor: '#e8f5e9', padding: '12px', borderRadius: '12px', marginBottom: '16px', display: 'flex', alignItems: 'start', gap: '10px' }}>
+                        <AlertCircle size={20} color="#2e7d32" />
+                        <p style={{ fontSize: '12px', color: '#1b5e20', margin: 0, lineHeight: '1.5' }}>
+                            Harga di bawah adalah <strong>Harga Eceran Tertinggi (HET)</strong> resmi untuk pupuk bersubsidi. Harga di tingkat pengecer resmi tidak boleh melebihi angka ini.
+                        </p>
+                    </div>
+
+                    {fertilizerPrices.map((item) => (
                         <PriceItem
                             key={item.id}
                             name={item.name}
                             price={item.today}
-                            trend={item.gap_change}
-                            unit={item.satuan.split('./')[1] || 'kg'}
-                            history={historyData[item.name] || []}
+                            trend="stable"
+                            unit={item.satuan}
+                            history={[]}
+                            isFertilizer={true}
                         />
                     ))}
-                    <button className="btn-primary mt-2" onClick={() => window.open('https://panelharga.badanpangan.go.id/', '_blank')}>
-                        Lihat Semua Harga
-                        <ArrowRight size={24} />
-                    </button>
+
                     <p style={{ textAlign: 'center', fontSize: '12px', color: '#888', marginTop: '12px' }}>
-                        {isOffline
-                            ? 'Menampilkan data terakhir yang disimpan'
-                            : 'Ketuk kartu harga untuk tren 5 hari'}
+                        Sumber: Cyber Extension Kementerian Pertanian
                     </p>
                 </>
             )}

@@ -1,0 +1,136 @@
+﻿python : C:\Users\garra
+\AppData\Local\Programs
+\Python\Python311\Lib\s
+ite-packages\pydantic\p
+lugin\_schema_validator
+.py:39: UserWarning: 
+ImportError while 
+loading the 
+`logfire-plugin` 
+Pydantic plugin, this 
+plugin will not be 
+installed.
+At line:1 char:1
++ python 
+backend/rag_logic.py > 
+output2.txt 2>&1; 
+Get-Content output2.t 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\garr   
+ a\...t be installe    
+d.:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+
+ImportError("cannot 
+import name 
+'ReadableLogRecord' 
+from 'opentelemetry.sdk
+._logs' (C:\\Users\\gar
+ra\\AppData\\Local\\Pro
+grams\\Python\\Python31
+1\\Lib\\site-packages\\
+opentelemetry\\sdk\\_lo
+gs\\__init__.py)")
+  plugins = 
+get_plugins()
+C:\Users\garra\AppData\
+Local\Programs\Python\P
+ython311\Lib\site-packa
+ges\langchain_google_ge
+nai\chat_models.py:47: 
+FutureWarning: 
+
+All support for the 
+`google.generativeai` 
+package has ended. It 
+will no longer be 
+receiving 
+updates or bug fixes. 
+Please switch to the 
+`google.genai` package 
+as soon as possible.
+See README for more 
+details:
+
+https://github.com/goog
+le-gemini/deprecated-ge
+nerative-ai-python/blob
+/main/README.md
+
+  from google.generativ
+eai.caching import 
+CachedContent  # type: 
+ignore[import]
+C:\Users\garra\.gemini\
+antigravity\scratch\tan
+i-cerdas\backend\rag_lo
+gic.py:146: LangChainDe
+precationWarning: 
+LangChain agents will 
+continue to be 
+supported, but it is 
+recommended for new 
+use cases to be built 
+with LangGraph. 
+LangGraph offers a 
+more flexible and 
+full-featured 
+framework for building 
+agents, including 
+support for 
+tool-calling, 
+persistence of state, 
+and human-in-the-loop 
+workflows. For 
+details, refer to the 
+`LangGraph 
+documentation <https://
+langchain-ai.github.io/
+langgraph/>`_ as well 
+as guides for 
+`Migrating from 
+AgentExecutor <https://
+python.langchain.com/do
+cs/how_to/migrate_agent
+/>`_ and LangGraph's 
+`Pre-built ReAct agent 
+<https://langchain-ai.g
+ithub.io/langgraph/how-
+tos/create-react-agent/
+>`_.
+  agent = 
+initialize_agent(
+C:\Users\garra\.gemini\
+antigravity\scratch\tan
+i-cerdas\backend\rag_lo
+gic.py:165: LangChainDe
+precationWarning: The 
+method `Chain.run` was 
+deprecated in 
+langchain 0.1.0 and 
+will be removed in 
+1.0. Use 
+:meth:`~invoke` 
+instead.
+  agent_response = 
+agent.run(sys_prompt)
+
+
+[1m> Entering new AgentExecutor chain...[0m
+[32;1m[1;3mAction: HargaPangan
+Action Input: cabai[0m
+Observation: [33;1m[1;3mMaaf, saat ini saya tidak bisa terhubung ke server harga Badan Pangan Nasional. Pastikan Anda memiliki koneksi internet yang stabil.[0m
+Thought:[32;1m[1;3mThought: Saya sudah mencoba mencari harga cabai menggunakan tool HargaPangan, namun gagal karena masalah koneksi server. Oleh karena itu, saya tidak bisa memberikan harga cabai saat ini. Saya perlu memberitahu petani tentang hal ini dengan sopan dan ramah.
+Final Answer: Mohon maaf, Bapak/Ibu Petani. Saya tidak bisa mendapatkan informasi harga cabai saat ini karena ada kendala teknis dalam menghubungkan ke server data harga pangan. Mohon coba lagi nanti, ya.[0m
+
+[1m> Finished chain.[0m
+Mohon maaf, Bapak/Ibu Petani. Saya tidak bisa mendapatkan informasi harga cabai saat ini karena ada kendala teknis dalam menghubungkan ke server data harga pangan. Mohon coba lagi nanti, ya.
