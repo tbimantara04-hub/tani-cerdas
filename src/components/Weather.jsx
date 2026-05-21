@@ -83,50 +83,51 @@ const Weather = () => {
     return (
         <div>
             {/* Current Weather Card */}
-            <div className="card text-center" style={{ backgroundColor: '#2D5A27', color: 'white' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div className="card text-center" style={{ backgroundColor: '#2D5A27', color: 'white', padding: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
                     <MapPin size={20} />
-                    <span style={{ fontWeight: '600' }}>{current.name}</span>
+                    <span style={{ fontWeight: '600', fontSize: '16px' }}>{current.name}</span>
                 </div>
                 <div className="mb-2">
                     {getWeatherIcon(current.weather[0].main, 80)}
                 </div>
-                <h2 style={{ fontSize: '48px', color: 'white' }}>{Math.round(current.main.temp)}°C</h2>
-                <p style={{ fontSize: '22px', textTransform: 'capitalize' }}>{current.weather[0].description}</p>
+                <h2 style={{ fontSize: 'clamp(32px, 8vw, 56px)', color: 'white', margin: '10px 0' }}>{Math.round(current.main.temp)}°C</h2>
+                <p style={{ fontSize: 'clamp(16px, 4vw, 24px)', textTransform: 'capitalize', margin: '8px 0' }}>{current.weather[0].description}</p>
             </div>
 
             {/* Info Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+            <div className="grid-2" style={{ marginBottom: '20px' }}>
                 <div className="card text-center" style={{ marginBottom: 0 }}>
                     <Thermometer className="mb-2" size={32} color="#2D5A27" style={{ margin: '0 auto' }} />
-                    <p style={{ fontSize: '14px', color: '#666' }}>Suhu</p>
-                    <p style={{ fontWeight: '700', fontSize: '24px' }}>{Math.round(current.main.temp)}°C</p>
+                    <p style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: '#666' }}>Suhu</p>
+                    <p style={{ fontWeight: '700', fontSize: 'clamp(18px, 5vw, 24px)' }}>{Math.round(current.main.temp)}°C</p>
                 </div>
                 <div className="card text-center" style={{ marginBottom: 0 }}>
                     <Gauge className="mb-2" size={32} color="#2D5A27" style={{ margin: '0 auto' }} />
-                    <p style={{ fontSize: '14px', color: '#666' }}>Tekanan</p>
-                    <p style={{ fontWeight: '700', fontSize: '24px' }}>{current.main.pressure}</p>
+                    <p style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: '#666' }}>Tekanan</p>
+                    <p style={{ fontWeight: '700', fontSize: 'clamp(18px, 5vw, 24px)' }}>{current.main.pressure}</p>
                 </div>
             </div>
 
             {/* Forecast Section */}
-            <h2 className="mb-4">Ramalan 5 Hari</h2>
-            <div className="card" style={{ padding: '15px' }}>
+            <h2 className="mb-4" style={{ fontSize: 'clamp(20px, 6vw, 28px)' }}>Ramalan 5 Hari</h2>
+            <div className="card" style={{ padding: '12px' }}>
                 {forecast.map((day, index) => (
                     <div key={index} style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        padding: '12px 0',
-                        borderBottom: index === forecast.length - 1 ? 'none' : '1px solid #eee'
+                        padding: '10px 0',
+                        borderBottom: index === forecast.length - 1 ? 'none' : '1px solid #eee',
+                        fontSize: 'clamp(12px, 3vw, 16px)'
                     }}>
-                        <div style={{ width: '100px', fontWeight: '600' }}>
+                        <div style={{ flex: '1', fontWeight: '600' }}>
                             {index === 0 ? "Hari ini" : getDayName(day.dt_txt)}
                         </div>
-                        <div>
-                            {getWeatherIcon(day.weather[0].main, 28)}
+                        <div style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}>
+                            {getWeatherIcon(day.weather[0].main, 24)}
                         </div>
-                        <div style={{ width: '60px', textAlign: 'right', fontWeight: '700' }}>
+                        <div style={{ flex: '0 0 60px', textAlign: 'right', fontWeight: '700' }}>
                             {Math.round(day.main.temp)}°C
                         </div>
                     </div>
@@ -134,8 +135,8 @@ const Weather = () => {
             </div>
 
             <div className="card" style={{ borderLeft: '8px solid #F4B41A', marginTop: '20px' }}>
-                <p style={{ fontWeight: '700' }}>Saran Tani:</p>
-                <p>Cuaca {current.weather[0].main === 'Rain' ? 'Hujan' : 'Cerah'}. {current.weather[0].main === 'Rain' ? 'Pastikan saluran air lancar.' : 'Waktu yang baik untuk menyiram tanaman.'}</p>
+                <p style={{ fontWeight: '700', fontSize: 'clamp(14px, 3vw, 16px)' }}>Saran Tani:</p>
+                <p style={{ fontSize: 'clamp(12px, 3vw, 14px)' }}>Cuaca {current.weather[0].main === 'Rain' ? 'Hujan' : 'Cerah'}. {current.weather[0].main === 'Rain' ? 'Pastikan saluran air lancar.' : 'Waktu yang baik untuk menyiram tanaman.'}</p>
             </div>
         </div>
     );
