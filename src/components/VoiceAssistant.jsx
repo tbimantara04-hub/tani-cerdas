@@ -3,10 +3,11 @@ import { Mic, MicOff, Volume2, Square, Globe } from 'lucide-react';
 
 import { infoData } from '../data/agriculturalData';
 
-const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategoryChange, infoCategory, selectedPlant }) => {
+const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategoryChange, infoCategory, selectedPlant, chatbotRef }) => {
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [supported, setSupported] = useState(true);
+    const [voiceStatus, setVoiceStatus] = useState(''); // Status text for user feedback
     const recognitionRef = useRef(null);
 
     // Auto-read plant details when selected
@@ -55,6 +56,7 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             recognitionRef.current.onerror = (event) => {
                 console.error('Speech recognition error', event.error);
                 setIsListening(false);
+                setVoiceStatus('');
             };
 
             recognitionRef.current.onend = () => {
@@ -72,7 +74,44 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
         };
     }, [activeTab]); // Depend on activeTab if we want context-aware commands later
 
-    const processCommand = (command) => {
+    const processCommand = async (command) => {
+        // ===== CHATBOT INTEGRATION =====
+        // Detect "tanya ai", "chat", "tanya", or "hai ai" commands
+        const chatTriggers = ['tanya ai', 'tanya a i', 'chat ai', 'hai ai', 'hey ai', 'hei ai'];
+        const askTriggers = ['tanya ', 'tanyakan ', 'tolong tanya ', 'tolong tanyakan '];
+        
+        // Check for exact chat triggers (open chatbot only)
+        if (chatTriggers.some(trigger => command.trim() === trigger)) {
+            if (chatbotRef?.current) {
+                chatbotRef.current.open();
+                speak('Chatbot sudah dibuka. Silakan bicara pertanyaan Anda.');
+            }
+            return;
+        }
+
+        // Check for "tanya ai [pertanyaan]" pattern - send question to chatbot
+        for (const trigger of chatTriggers) {
+            if (command.startsWith(trigger + ' ')) {
+                const question = command.substring(trigger.length + 1).trim();
+                if (question && chatbotRef?.current) {
+                    await sendToChatbot(question);
+                }
+                return;
+            }
+        }
+
+        // Check for "tanya [pertanyaan]" pattern
+        for (const trigger of askTriggers) {
+            if (command.startsWith(trigger)) {
+                const question = command.substring(trigger.length).trim();
+                if (question && chatbotRef?.current) {
+                    await sendToChatbot(question);
+                }
+                return;
+            }
+        }
+
+        // ===== EXISTING NAVIGATION COMMANDS =====
         // Info sub-commands
         if (command.includes('bibit')) {
             onNavigate('info');
@@ -113,18 +152,50 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             speak('Membuka halaman Harga');
         } else if (command.includes('baca') || command.includes('ngomong')) {
             readCurrentPage();
+        } else if (command.includes('tutup chat') || command.includes('tutup chatbot')) {
+            if (chatbotRef?.current) {
+                chatbotRef.current.close();
+                speak('Chatbot ditutup.');
+            }
         } else {
-            speak('Maaf, saya tidak mengerti.');
+            // If command doesn't match any navigation, send it to chatbot as a question
+            if (chatbotRef?.current) {
+                await sendToChatbot(command);
+            } else {
+                speak('Maaf, saya tidak mengerti.');
+            }
+        }
+    };
+
+    // Send message to chatbot and read the response aloud
+    const sendToChatbot = async (question) => {
+        setVoiceStatus('Mengirim ke AI...');
+        speak(`Mengirimkan pertanyaan: ${question}`);
+        
+        try {
+            const botResponse = await chatbotRef.current.sendMessage(question);
+            setVoiceStatus('Membacakan jawaban...');
+            
+            // Wait a moment for the "sending" speech to finish, then read the response
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            speak(`Jawaban dari AI: ${botResponse}`);
+        } catch (error) {
+            console.error('Error sending to chatbot:', error);
+            speak('Maaf, terjadi kesalahan saat menghubungi AI.');
+        } finally {
+            setVoiceStatus('');
         }
     };
 
     const toggleListening = () => {
         if (isListening) {
             recognitionRef.current.stop();
+            setVoiceStatus('');
         } else {
             try {
                 recognitionRef.current.start();
                 setIsListening(true);
+                setVoiceStatus('Mendengarkan...');
             } catch (error) {
                 console.error("Error starting recognition", error);
             }
@@ -138,8 +209,14 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             utterance.lang = 'id-ID';
 
             utterance.onstart = () => setIsSpeaking(true);
-            utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = () => setIsSpeaking(false);
+            utterance.onend = () => {
+                setIsSpeaking(false);
+                setVoiceStatus('');
+            };
+            utterance.onerror = () => {
+                setIsSpeaking(false);
+                setVoiceStatus('');
+            };
 
             window.speechSynthesis.speak(utterance);
         }
@@ -194,8 +271,25 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             display: 'flex',
             flexDirection: 'column',
             gap: '10px',
-            zIndex: 1000
+            zIndex: 1000,
+            alignItems: 'flex-end'
         }}>
+            {/* Status Label */}
+            {voiceStatus && (
+                <div style={{
+                    backgroundColor: 'rgba(45, 90, 39, 0.9)',
+                    color: 'white',
+                    padding: '8px 14px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    animation: 'fadeInUp 0.3s ease'
+                }}>
+                    {voiceStatus}
+                </div>
+            )}
+
             {/* Listening Button */}
             <button
                 onClick={toggleListening}
@@ -209,9 +303,12 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                    boxShadow: isListening
+                        ? '0 4px 6px rgba(239,68,68,0.3), 0 0 0 4px rgba(239,68,68,0.15)'
+                        : '0 4px 6px rgba(0,0,0,0.1)',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    animation: isListening ? 'pulse-voice 1.5s ease-in-out infinite' : 'none'
                 }}
                 aria-label="Fitur Suara"
             >
@@ -245,7 +342,7 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
                 <div style={{
                     position: 'absolute',
                     right: '65px',
-                    top: '15px',
+                    top: voiceStatus ? '55px' : '15px',
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     color: 'white',
                     padding: '4px 8px',
@@ -256,6 +353,20 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
                     Mendengarkan...
                 </div>
             )}
+
+            <style>
+                {`
+                @keyframes pulse-voice {
+                    0% { box-shadow: 0 4px 6px rgba(239,68,68,0.3), 0 0 0 0px rgba(239,68,68,0.3); }
+                    50% { box-shadow: 0 4px 6px rgba(239,68,68,0.3), 0 0 0 12px rgba(239,68,68,0); }
+                    100% { box-shadow: 0 4px 6px rgba(239,68,68,0.3), 0 0 0 0px rgba(239,68,68,0.3); }
+                }
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                `}
+            </style>
         </div>
     );
 };

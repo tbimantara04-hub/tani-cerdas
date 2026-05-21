@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { MessageCircle, X, Send, Loader2, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
-const Chatbot = () => {
+const Chatbot = forwardRef((props, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
         { id: 1, text: "Halo! Saya Tani-Cerdas AI. Ada yang bisa saya bantu terkait pertanian hari ini?", sender: "bot" }
@@ -61,13 +61,8 @@ const Chatbot = () => {
         }
     }, [messages, isOpen]);
 
-    const handleSend = async () => {
-        if (!input.trim()) return;
-
-        const userMessage = input.trim();
-        setInput('');
-        
-        // Add user message
+    // Core send logic, returns the bot response text
+    const sendMessageToAPI = async (userMessage) => {
         const newUserMsg = { id: Date.now(), text: userMessage, sender: "user" };
         setMessages(prev => [...prev, newUserMsg]);
         setIsLoading(true);
@@ -83,13 +78,23 @@ const Chatbot = () => {
             
             const botMsg = { id: Date.now() + 1, text: sanitizedText, sender: "bot" };
             setMessages(prev => [...prev, botMsg]);
+            return sanitizedText;
         } catch (error) {
             console.error("Error communicating with chatbot:", error);
-            const errorMsg = { id: Date.now() + 1, text: "Maaf, terjadi kesalahan saat menghubungi server.", sender: "bot" };
+            const errorText = "Maaf, terjadi kesalahan saat menghubungi server.";
+            const errorMsg = { id: Date.now() + 1, text: errorText, sender: "bot" };
             setMessages(prev => [...prev, errorMsg]);
+            return errorText;
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleSend = async () => {
+        if (!input.trim()) return;
+        const userMessage = input.trim();
+        setInput('');
+        await sendMessageToAPI(userMessage);
     };
 
     const handleKeyDown = (e) => {
@@ -98,6 +103,24 @@ const Chatbot = () => {
             handleSend();
         }
     };
+
+    // Expose methods to parent (VoiceAssistant) via ref
+    useImperativeHandle(ref, () => ({
+        // Open the chatbot window
+        open: () => setIsOpen(true),
+        // Close the chatbot window
+        close: () => setIsOpen(false),
+        // Check if chatbot is open
+        isOpen: () => isOpen,
+        // Send a message programmatically and return the bot's response
+        sendMessage: async (message) => {
+            setIsOpen(true); // Auto-open chatbot when sending via voice
+            // Small delay to let the UI open first
+            await new Promise(resolve => setTimeout(resolve, 300));
+            const botResponse = await sendMessageToAPI(message);
+            return botResponse;
+        }
+    }));
 
     return (
         <>
@@ -313,6 +336,8 @@ const Chatbot = () => {
             </style>
         </>
     );
-};
+});
+
+Chatbot.displayName = 'Chatbot';
 
 export default Chatbot;

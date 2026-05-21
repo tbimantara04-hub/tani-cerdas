@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Cloud, BookOpen, Scale as Tag, Menu, Home, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Weather from './components/Weather';
@@ -16,6 +16,7 @@ function App() {
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const chatbotRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -114,8 +115,9 @@ function App() {
             onInfoCategoryChange={setInfoCategory}
             infoCategory={infoCategory}
             selectedPlant={selectedPlant}
+            chatbotRef={chatbotRef}
           />
-          <Chatbot />
+          <Chatbot ref={chatbotRef} />
         </main>
       </div>
     </div>
