@@ -1,16 +1,86 @@
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { MessageCircle, X, Send, Loader2, Bot } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Bot, Mic, MicOff, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
 const Chatbot = forwardRef((props, ref) => {
     const [isOpen, setIsOpen] = useState(false);
+    const isOpenRef = useRef(false);
     const [messages, setMessages] = useState([
         { id: 1, text: "Halo! Saya Tani-Cerdas AI. Ada yang bisa saya bantu terkait pertanian hari ini?", sender: "bot" }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isListening, setIsListening] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const messagesEndRef = useRef(null);
+    const recognitionRef = useRef(null);
+
+    // Initialize Speech Recognition for Chatbot
+    useEffect(() => {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognitionRef.current = new SpeechRecognition();
+            recognitionRef.current.continuous = false;
+            recognitionRef.current.interimResults = false;
+            recognitionRef.current.lang = 'id-ID';
+
+            recognitionRef.current.onresult = async (event) => {
+                const transcript = event.results[0][0].transcript;
+                console.log('Chatbot Voice Input:', transcript);
+                setIsListening(false);
+                // Send the voice input directly
+                await sendMessageToAPI(transcript, true);
+            };
+
+            recognitionRef.current.onerror = (event) => {
+                console.error('Chatbot speech recognition error', event.error);
+                setIsListening(false);
+            };
+
+            recognitionRef.current.onend = () => {
+                setIsListening(false);
+            };
+        }
+        
+        return () => {
+            if (recognitionRef.current) recognitionRef.current.abort();
+            stopSpeaking();
+        };
+    }, []);
+
+    const toggleListening = () => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+            setIsListening(false);
+        } else {
+            try {
+                recognitionRef.current?.start();
+                setIsListening(true);
+            } catch (error) {
+                console.error("Error starting recognition", error);
+            }
+        }
+    };
+
+    const speak = (text) => {
+        if ('speechSynthesis' in window) {
+            stopSpeaking();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID';
+            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onend = () => setIsSpeaking(false);
+            utterance.onerror = () => setIsSpeaking(false);
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+
+    const stopSpeaking = () => {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+        }
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -19,7 +89,7 @@ const Chatbot = forwardRef((props, ref) => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/history');
+                const response = await axios.get('http://127.0.0.1:8000/api/history');
                 if (response.data && Array.isArray(response.data) && response.data.length > 0) {
                     const historyMessages = response.data.flatMap((item, index) => {
                         const ts = item.timestamp ? new Date(item.timestamp).getTime() : index;
@@ -62,13 +132,13 @@ const Chatbot = forwardRef((props, ref) => {
     }, [messages, isOpen]);
 
     // Core send logic, returns the bot response text
-    const sendMessageToAPI = async (userMessage) => {
+    const sendMessageToAPI = async (userMessage, readAloud = false) => {
         const newUserMsg = { id: Date.now(), text: userMessage, sender: "user" };
         setMessages(prev => [...prev, newUserMsg]);
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:8000/api/chat', {
+            const response = await axios.post('http://127.0.0.1:8000/api/chat', {
                 message: userMessage
             });
             
@@ -78,6 +148,12 @@ const Chatbot = forwardRef((props, ref) => {
             
             const botMsg = { id: Date.now() + 1, text: sanitizedText, sender: "bot" };
             setMessages(prev => [...prev, botMsg]);
+            
+            // Read aloud if requested (e.g. from voice input)
+            if (readAloud) {
+                speak(sanitizedText);
+            }
+            
             return sanitizedText;
         } catch (error) {
             console.error("Error communicating with chatbot:", error);
@@ -104,14 +180,19 @@ const Chatbot = forwardRef((props, ref) => {
         }
     };
 
+    // Keep isOpenRef in sync with isOpen state
+    useEffect(() => {
+        isOpenRef.current = isOpen;
+    }, [isOpen]);
+
     // Expose methods to parent (VoiceAssistant) via ref
     useImperativeHandle(ref, () => ({
         // Open the chatbot window
         open: () => setIsOpen(true),
         // Close the chatbot window
         close: () => setIsOpen(false),
-        // Check if chatbot is open
-        isOpen: () => isOpen,
+        // Check if chatbot is open - uses ref to avoid stale closure
+        isOpen: () => isOpenRef.current,
         // Send a message programmatically and return the bot's response
         sendMessage: async (message) => {
             setIsOpen(true); // Auto-open chatbot when sending via voice
@@ -191,12 +272,23 @@ const Chatbot = forwardRef((props, ref) => {
                                 <Bot size={24} />
                                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold', color: 'white' }}>Tani-Cerdas AI</h3>
                             </div>
-                            <button 
-                                onClick={() => setIsOpen(false)}
-                                style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '4px' }}
-                            >
-                                <X size={20} />
-                            </button>
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                {isSpeaking && (
+                                    <button 
+                                        onClick={stopSpeaking}
+                                        title="Hentikan suara"
+                                        style={{ background: 'none', border: 'none', color: '#F4B41A', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+                                    >
+                                        <Volume2 size={20} />
+                                    </button>
+                                )}
+                                <button 
+                                    onClick={() => setIsOpen(false)}
+                                    style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Messages Area */}
@@ -283,13 +375,35 @@ const Chatbot = forwardRef((props, ref) => {
                             borderTop: '1px solid #eee',
                             backgroundColor: 'white',
                             display: 'flex',
-                            gap: '8px'
+                            gap: '8px',
+                            alignItems: 'center'
                         }}>
+                            <button
+                                onClick={toggleListening}
+                                title={isListening ? "Berhenti mendengarkan" : "Gunakan suara"}
+                                style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '50%',
+                                    backgroundColor: isListening ? '#ef4444' : '#f5f5f5',
+                                    color: isListening ? 'white' : '#666',
+                                    border: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+                            </button>
+                            
                             <textarea
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                placeholder="Ketik pesan..."
+                                placeholder={isListening ? "Mendengarkan..." : "Ketik pesan..."}
+                                disabled={isListening}
                                 style={{
                                     flex: 1,
                                     resize: 'none',
@@ -299,7 +413,8 @@ const Chatbot = forwardRef((props, ref) => {
                                     height: '44px',
                                     fontFamily: 'inherit',
                                     fontSize: '14px',
-                                    outline: 'none'
+                                    outline: 'none',
+                                    backgroundColor: isListening ? '#f9fafb' : 'white'
                                 }}
                             />
                             <button

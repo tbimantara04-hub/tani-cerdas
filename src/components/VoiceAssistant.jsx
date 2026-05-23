@@ -12,6 +12,8 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
 
     // Auto-read plant details when selected
     useEffect(() => {
+        // Skip auto-read if chatbot is open (voice is in chatbot-only mode)
+        if (chatbotRef?.current?.isOpen()) return;
         if (activeTab === 'info' && selectedPlant && infoCategory) {
             const plantData = selectedPlant.data[infoCategory];
             if (plantData) {
@@ -26,6 +28,8 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
 
     // Auto-read info category when selected
     useEffect(() => {
+        // Skip auto-read if chatbot is open (voice is in chatbot-only mode)
+        if (chatbotRef?.current?.isOpen()) return;
         if (activeTab === 'info' && infoCategory && !selectedPlant) {
             const categoryData = infoData.find(item => item.categoryKey === infoCategory);
             if (categoryData) {
@@ -75,42 +79,6 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
     }, [activeTab]); // Depend on activeTab if we want context-aware commands later
 
     const processCommand = async (command) => {
-        // ===== CHATBOT INTEGRATION =====
-        // Detect "tanya ai", "chat", "tanya", or "hai ai" commands
-        const chatTriggers = ['tanya ai', 'tanya a i', 'chat ai', 'hai ai', 'hey ai', 'hei ai'];
-        const askTriggers = ['tanya ', 'tanyakan ', 'tolong tanya ', 'tolong tanyakan '];
-        
-        // Check for exact chat triggers (open chatbot only)
-        if (chatTriggers.some(trigger => command.trim() === trigger)) {
-            if (chatbotRef?.current) {
-                chatbotRef.current.open();
-                speak('Chatbot sudah dibuka. Silakan bicara pertanyaan Anda.');
-            }
-            return;
-        }
-
-        // Check for "tanya ai [pertanyaan]" pattern - send question to chatbot
-        for (const trigger of chatTriggers) {
-            if (command.startsWith(trigger + ' ')) {
-                const question = command.substring(trigger.length + 1).trim();
-                if (question && chatbotRef?.current) {
-                    await sendToChatbot(question);
-                }
-                return;
-            }
-        }
-
-        // Check for "tanya [pertanyaan]" pattern
-        for (const trigger of askTriggers) {
-            if (command.startsWith(trigger)) {
-                const question = command.substring(trigger.length).trim();
-                if (question && chatbotRef?.current) {
-                    await sendToChatbot(question);
-                }
-                return;
-            }
-        }
-
         // ===== EXISTING NAVIGATION COMMANDS =====
         // Info sub-commands
         if (command.includes('bibit')) {
@@ -152,38 +120,18 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             speak('Membuka halaman Harga');
         } else if (command.includes('baca') || command.includes('ngomong')) {
             readCurrentPage();
-        } else if (command.includes('tutup chat') || command.includes('tutup chatbot')) {
+        } else if (command.includes('buka chat') || command.includes('tanya ai')) {
+            if (chatbotRef?.current) {
+                chatbotRef.current.open();
+                speak('Membuka chatbot AI.');
+            }
+        } else if (command.includes('tutup chat') || command.includes('keluar chat')) {
             if (chatbotRef?.current) {
                 chatbotRef.current.close();
-                speak('Chatbot ditutup.');
+                speak('Menutup chatbot.');
             }
         } else {
-            // If command doesn't match any navigation, send it to chatbot as a question
-            if (chatbotRef?.current) {
-                await sendToChatbot(command);
-            } else {
-                speak('Maaf, saya tidak mengerti.');
-            }
-        }
-    };
-
-    // Send message to chatbot and read the response aloud
-    const sendToChatbot = async (question) => {
-        setVoiceStatus('Mengirim ke AI...');
-        speak(`Mengirimkan pertanyaan: ${question}`);
-        
-        try {
-            const botResponse = await chatbotRef.current.sendMessage(question);
-            setVoiceStatus('Membacakan jawaban...');
-            
-            // Wait a moment for the "sending" speech to finish, then read the response
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            speak(`Jawaban dari AI: ${botResponse}`);
-        } catch (error) {
-            console.error('Error sending to chatbot:', error);
-            speak('Maaf, terjadi kesalahan saat menghubungi AI.');
-        } finally {
-            setVoiceStatus('');
+            speak('Maaf, saya tidak mengerti. Gunakan tombol mic di chatbot untuk bertanya pada AI.');
         }
     };
 

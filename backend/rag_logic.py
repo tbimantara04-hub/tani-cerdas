@@ -81,7 +81,7 @@ def get_retriever():
 # TOOLS — Definisi semua tool
 # ============================================================
 
-def tanya_panduan_hama(query: str) -> str:
+def tanya_panduan_hama(query: str = "pertanian umum") -> str:
     """Mencari jawaban tentang hama/teknik tani dari dokumen."""
     retriever = get_retriever()
     if not retriever: return "Panduan tidak tersedia."
@@ -201,8 +201,11 @@ def ask_chatbot(query: str):
                 
                 if action in TOOL_DISPATCHER:
                     used_tools.append(action)
-                    observation = TOOL_DISPATCHER[action](**action_input)
-                    messages.append(HumanMessage(content=f"Data RAG / API berhasil ditarik. Hasil untuk tool {action}:\n{observation}\n\nSekarang, berikan jawaban akhir yang ramah kepada pengguna berdasarkan data di atas."))
+                    try:
+                        observation = TOOL_DISPATCHER[action](**action_input)
+                        messages.append(HumanMessage(content=f"Data RAG / API berhasil ditarik. Hasil untuk tool {action}:\n{observation}\n\nSekarang, berikan jawaban akhir yang ramah kepada pengguna berdasarkan data di atas."))
+                    except Exception as e:
+                        messages.append(HumanMessage(content=f"Gagal menjalankan tool {action} karena error: {str(e)}. Coba jawab tanpa tool ini atau perbaiki argumenmu."))
                     continue
             except json.JSONDecodeError:
                 pass
