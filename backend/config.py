@@ -98,7 +98,7 @@ DATA_DIR = os.getenv("DATA_DIR", "data")
 # ============================================================
 
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL_CHAT = os.getenv("OLLAMA_MODEL_CHAT", "qwen2:1.5b")
+OLLAMA_MODEL_CHAT = os.getenv("OLLAMA_MODEL_CHAT", "qwen2:2.5")
 OLLAMA_MODEL_EMBED = os.getenv("OLLAMA_MODEL_EMBED", "nomic-embed-text")
 
 OLLAMA_CONFIG = {
