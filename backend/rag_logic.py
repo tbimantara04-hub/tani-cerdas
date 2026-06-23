@@ -35,6 +35,7 @@ load_dotenv()
 llm = ChatOllama(
     model="qwen2:1.5b",
     temperature=0.1,
+    num_gpu=0,
 )
 
 # Embedding lokal menggunakan nomic-embed-text (Ollama)

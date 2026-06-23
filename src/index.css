@@ -611,3 +611,36 @@ main.container {
     display: none;
   }
 }
+
+/* Voice Assistant Animations */
+@keyframes pulse-voice {
+  0%, 100% {
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3), 0 0 0 4px rgba(239, 68, 68, 0.15);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4), 0 0 0 8px rgba(239, 68, 68, 0.25);
+  }
+}
+
+@keyframes pulse-chatbot {
+  0%, 100% {
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4), 0 0 0 6px rgba(59, 130, 246, 0.2);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

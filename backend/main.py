@@ -24,6 +24,8 @@ PLANTING_FILE = "storage/planting_records.json"
 CHAT_HISTORY_FILE = "storage/chat_history.json"
 
 def save_encrypted_data(file_path, data):
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
     # Enkripsi data sebelum disimpan (Data at Rest)
     json_data = json.dumps(data)
     encrypted_data = encryptor.encrypt(json_data)

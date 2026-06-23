@@ -8,6 +8,7 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [supported, setSupported] = useState(true);
     const [voiceStatus, setVoiceStatus] = useState(''); // Status text for user feedback
+    const [isChatbotMode, setIsChatbotMode] = useState(false); // Track if in chatbot-only mode
     const recognitionRef = useRef(null);
 
     // Auto-read plant details when selected
@@ -53,32 +54,102 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             recognitionRef.current.onresult = (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
                 console.log('Voice Command:', transcript);
-                processCommand(transcript);
-                setIsListening(false);
-            };
+                const processCommand = async (command) => {
+                    // ===== CHATBOT MODE - Only process chatbot questions =====
+                    if (isChatbotMode) {
+                        // Exit chatbot mode with specific commands
+                        if (command.includes('selesai') || command.includes('tutup') || command.includes('keluar')) {
+                            setIsChatbotMode(false);
+                            if (chatbotRef?.current) {
+                                chatbotRef.current.close();
+                            }
+                            speak('Keluar dari mode chat. Saya siap membantu dengan perintah lain.');
+                            return;
+                        }
 
-            recognitionRef.current.onerror = (event) => {
-                console.error('Speech recognition error', event.error);
-                setIsListening(false);
-                setVoiceStatus('');
-            };
+                        // Send all other commands directly to chatbot while in chatbot mode
+                        if (command.trim() && chatbotRef?.current) {
+                            await sendToChatbot(command);
+                        }
+                        return;
+                    }
 
-            recognitionRef.current.onend = () => {
-                setIsListening(false);
-            };
-        } else {
-            setSupported(false);
+                    // ===== CHATBOT INTEGRATION =====
+                    // Detect "tanya ai", "chat", "tanya", or "hai ai" commands
+                    const chatTriggers = ['tanya ai', 'tanya a i', 'chat ai', 'hai ai', 'hey ai', 'hei ai'];
+                    const askTriggers = ['tanya ', 'tanyakan ', 'tolong tanya ', 'tolong tanyakan '];
+
+                    // Check for exact chat triggers (open chatbot only and ENTER CHATBOT MODE)
+                    if (chatTriggers.some(trigger => command.trim() === trigger)) {
+                        if (chatbotRef?.current) {
+                            chatbotRef.current.open();
+                            setIsChatbotMode(true); // Enter chatbot-only mode
+                            speak('Chatbot sudah dibuka. Silakan ucapkan pertanyaan Anda.');
+                            // Auto-start listening for chatbot questions
+                            setTimeout(() => {
+                                if (recognitionRef.current && !isListening) {
+                                    recognitionRef.current.start();
+                                    setIsListening(true);
+                                    setVoiceStatus('Mendengarkan untuk Chatbot...');
+                                }
+                            }, 1000);
+                        }
+                        return;
+                    }
+
+                    // Check for "tanya ai [pertanyaan]" pattern - send question to chatbot
+                    for (const trigger of chatTriggers) {
+                        if (command.startsWith(trigger + ' ')) {
+                            const question = command.substring(trigger.length + 1).trim();
+                            if (question && chatbotRef?.current) {
+                                setIsChatbotMode(true); // Enter chatbot-only mode
+                                if (!chatbotRef.current.isOpen?.()) {
+                                    chatbotRef.current.open();
+                                }
+                                await sendToChatbot(question);
+                            }
+                            return;
+                        }
+                    }
+
+                    // Check for "tanya [pertanyaan]" pattern
+                    for (const trigger of askTriggers) {
+                        if (command.startsWith(trigger)) {
+                            const question = command.substring(trigger.length).trim();
+                            if (question && chatbotRef?.current) {
+                                if (!chatbotRef.current.isOpen?.()) {
+                                    chatbotRef.current.open();
+                                }
+                                await sendToChatbot(question);
+                            }
+                            return;
+                        }
+                    }
+                    setIsChatbotMode(true); // Enter chatbot mode
+                    if (!chatbotRef.current.isOpen?.()) {
+                        chatbotRef.current.open();
+                    }
+                    await sendToChatbot(question);
+                }
+                return;
+            }
         }
 
-        return () => {
-            if (recognitionRef.current) {
-                recognitionRef.current.abort();
+        // Check for "tanya [pertanyaan]" pattern
+        for (const trigger of askTriggers) {
+            if (command.startsWith(trigger)) {
+                const question = command.substring(trigger.length).trim();
+                if (question && chatbotRef?.current) {
+                    if (!chatbotRef.current.isOpen?.()) {
+                        chatbotRef.current.open();
+                    }
+                    await sendToChatbot(question);
+                }
+                return;
             }
-            stopSpeaking();
-        };
-    }, [activeTab]); // Depend on activeTab if we want context-aware commands later
+        }
 
-    const processCommand = async (command) => {
+>>>>>>> eb1e6ed (Agentic overhaul: add multi-agent orchestrator, agents, memory, tools, API and frontend integration)
         // ===== EXISTING NAVIGATION COMMANDS =====
         // Info sub-commands
         if (command.includes('bibit')) {
@@ -121,17 +192,73 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
         } else if (command.includes('baca') || command.includes('ngomong')) {
             readCurrentPage();
         } else if (command.includes('buka chat') || command.includes('tanya ai')) {
-            if (chatbotRef?.current) {
-                chatbotRef.current.open();
-                speak('Membuka chatbot AI.');
+            } else {
+                // If command doesn't match any navigation, send it to chatbot as a question
+                if (chatbotRef?.current) {
+                    await sendToChatbot(command);
+                } else {
+                    speak('Maaf, saya tidak mengerti. Gunakan tombol mic di chatbot untuk bertanya pada AI.');
+                }
             }
-        } else if (command.includes('tutup chat') || command.includes('keluar chat')) {
-            if (chatbotRef?.current) {
-                chatbotRef.current.close();
-                speak('Menutup chatbot.');
+        };
+
+        // Send message to chatbot and read the response aloud
+        const sendToChatbot = async (question) => {
+            setVoiceStatus('Mengirim ke AI...');
+            speak(`Mengirimkan pertanyaan: ${question}`);
+        
+            try {
+                const botResponse = await chatbotRef.current.sendMessage(question);
+            
+                // Only update status if not in chatbot mode
+                if (!isChatbotMode) {
+                    setVoiceStatus('Membacakan jawaban...');
+                }
+            
+                // Wait a moment for the "sending" speech to finish, then read the response
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                speak(`Jawaban dari AI: ${botResponse}`);
+            
+                // If in chatbot mode, automatically start listening for next question after response is read
+                if (isChatbotMode) {
+                    // Wait for speech to finish (approximately based on text length)
+                    const estimatedDuration = (botResponse.length / 100) * 1000 + 2000; // rough estimate
+                    await new Promise(resolve => setTimeout(resolve, estimatedDuration));
+                
+                    // Auto-start listening for next question
+                    if (recognitionRef.current && !isListening) {
+                        recognitionRef.current.start();
+                        setIsListening(true);
+                        setVoiceStatus('Siap untuk pertanyaan berikutnya...');
+                    }
+                }
+            } catch (error) {
+                console.error('Error sending to chatbot:', error);
+                speak('Maaf, terjadi kesalahan saat menghubungi AI.');
+            
+                // In chatbot mode, restart listening after error
+                if (isChatbotMode) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    if (recognitionRef.current && !isListening) {
+                        recognitionRef.current.start();
+                        setIsListening(true);
+                        setVoiceStatus('Siap untuk pertanyaan berikutnya...');
+                    }
+                }
+            } finally {
+                // Don't clear voiceStatus in chatbot mode
+                if (!isChatbotMode) {
+                    setVoiceStatus('');
+                }
             }
-        } else {
-            speak('Maaf, saya tidak mengerti. Gunakan tombol mic di chatbot untuk bertanya pada AI.');
+        };
+            }
+        } finally {
+            // Don't clear voiceStatus in chatbot mode
+            if (!isChatbotMode) {
+                setVoiceStatus('');
+            }
+>>>>>>> eb1e6ed (Agentic overhaul: add multi-agent orchestrator, agents, memory, tools, API and frontend integration)
         }
     };
 
@@ -225,16 +352,35 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             {/* Status Label */}
             {voiceStatus && (
                 <div style={{
-                    backgroundColor: 'rgba(45, 90, 39, 0.9)',
+                    backgroundColor: isChatbotMode ? 'rgba(59, 130, 246, 0.9)' : 'rgba(45, 90, 39, 0.9)',
                     color: 'white',
                     padding: '8px 14px',
                     borderRadius: '20px',
                     fontSize: '13px',
                     whiteSpace: 'nowrap',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                    animation: 'fadeInUp 0.3s ease'
+                    animation: 'fadeInUp 0.3s ease',
+                    fontWeight: isChatbotMode ? '600' : 'normal'
                 }}>
                     {voiceStatus}
+                </div>
+            )}
+
+            {/* Chatbot Mode Indicator */}
+            {isChatbotMode && (
+                <div style={{
+                    backgroundColor: 'rgba(59, 130, 246, 0.9)',
+                    color: 'white',
+                    padding: '8px 14px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    animation: 'fadeInUp 0.3s ease',
+                    fontWeight: '600',
+                    border: '2px solid rgba(255,255,255,0.3)'
+                }}>
+                    🎙️ Mode Chat AI Aktif
                 </div>
             )}
 
@@ -242,9 +388,9 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
             <button
                 onClick={toggleListening}
                 style={{
-                    backgroundColor: isListening ? '#ef4444' : '#2D5A27',
+                    backgroundColor: isListening ? '#ef4444' : (isChatbotMode ? '#3b82f6' : '#2D5A27'),
                     color: 'white',
-                    border: 'none',
+                    border: isChatbotMode ? '2px solid rgba(255,255,255,0.5)' : 'none',
                     borderRadius: '50%',
                     width: '56px',
                     height: '56px',
@@ -253,12 +399,12 @@ const VoiceAssistant = ({ activeTab, onNavigate, onPriceTabChange, onInfoCategor
                     alignItems: 'center',
                     boxShadow: isListening
                         ? '0 4px 6px rgba(239,68,68,0.3), 0 0 0 4px rgba(239,68,68,0.15)'
-                        : '0 4px 6px rgba(0,0,0,0.1)',
+                        : (isChatbotMode ? '0 4px 6px rgba(59,130,246,0.3)' : '0 4px 6px rgba(0,0,0,0.1)'),
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    animation: isListening ? 'pulse-voice 1.5s ease-in-out infinite' : 'none'
+                    animation: isListening ? 'pulse-voice 1.5s ease-in-out infinite' : (isChatbotMode ? 'pulse-chatbot 2s ease-in-out infinite' : 'none')
                 }}
-                aria-label="Fitur Suara"
+                aria-label={isChatbotMode ? "Mode Chat Aktif" : "Fitur Suara"}
             >
                 {isListening ? <MicOff size={24} /> : <Mic size={24} />}
             </button>

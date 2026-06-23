@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:all": "concurrently \"npm:dev\" \"npm:backend\"",
-    "backend": "cd backend && venv\\Scripts\\python main.py",
+    "backend": "cd backend && .\\venv\\Scripts\\python.exe main.py",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
