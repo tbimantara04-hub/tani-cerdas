@@ -27,13 +27,11 @@ const AgenticChatbot = forwardRef((props, ref) => {
 
     const API_BASE = 'http://localhost:8000';
 
-    // Detect system mode on mount
     useEffect(() => {
         detectSystemMode();
         loadChatHistory();
     }, []);
 
-    // Auto-scroll to bottom
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
@@ -105,7 +103,6 @@ const AgenticChatbot = forwardRef((props, ref) => {
     const sendMessage = async () => {
         if (!input.trim()) return;
 
-        // Add user message
         const userMessage = {
             id: Date.now(),
             text: input,
@@ -166,7 +163,6 @@ const AgenticChatbot = forwardRef((props, ref) => {
         }
     };
 
-    // Expose methods via ref
     useImperativeHandle(ref, () => ({
         openChat: () => setIsOpen(true),
         closeChat: () => setIsOpen(false),
