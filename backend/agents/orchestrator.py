@@ -46,7 +46,7 @@ class AgentOrchestrator:
         }
         print(f"[Orchestrator] Initialized {len(self.agents)} agents")
     
-    def process_query(self, query: str, farmer_id: str = "default") -> Dict[str, Any]:
+    def process_query(self, query: str, farmer_id: str = "default", llm_mode: str = "local") -> Dict[str, Any]:
         """
         Process a query by routing to appropriate agent(s).
         """
@@ -69,7 +69,8 @@ class AgentOrchestrator:
         context = {
             "farmer_id": farmer_id,
             "profile": farmer_context.get_profile(),
-            "query": query
+            "query": query,
+            "llm_mode": llm_mode
         }
         
         # Get response from primary agent

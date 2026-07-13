@@ -23,6 +23,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama import ChatOllama, OllamaEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 import glob
 
@@ -30,13 +31,22 @@ load_dotenv()
 # Tidak lagi membutuhkan GOOGLE_API_KEY untuk Qwen, tapi security.py mungkin butuh ENCRYPTION_KEY
 
 # ============================================================
-# LLM — Local Qwen 14B (Ollama)
+# LLM — Dynamic Selection (Ollama or Google Gemini API)
 # ============================================================
-llm = ChatOllama(
-    model="qwen2:1.5b",
-    temperature=0.1,
-    num_gpu=0,
-)
+def get_llm(llm_mode="local"):
+    if llm_mode == "api":
+        google_api_key = os.environ.get("GOOGLE_API_KEY")
+        if not google_api_key or google_api_key == "your_gemini_api_key_here":
+            raise ValueError("GOOGLE_API_KEY_MISSING")
+        return ChatGoogleGenerativeAI(
+            model="gemini-1.5-flash",
+            temperature=0.1
+        )
+    return ChatOllama(
+        model="qwen2:1.5b",
+        temperature=0.1,
+        num_gpu=0,
+    )
 
 # Embedding lokal menggunakan nomic-embed-text (Ollama)
 # Jika belum ada, pastikan jalankan: ollama pull nomic-embed-text
@@ -170,7 +180,7 @@ ATURAN BALASAN SANGAT KETAT:
 - JIKA DAN HANYA JIKA kamu BUTUH MENARIK DATA dari tool, BALAS HANYA DENGAN BLOK JSON tunggal berikut (tanpa ada teks lain, tanpa kata Thought):
 {"action": "nama_tool", "action_input": {"nama_parameter": "nilai"}}"""
 
-def ask_chatbot(query: str):
+def ask_chatbot(query: str, llm_mode: str = "local"):
     profile = ambil_profil_petani()
     context_str = ""
     if profile:
@@ -188,32 +198,44 @@ def ask_chatbot(query: str):
         HumanMessage(content=query)
     ]
     used_tools = []
+    llm = get_llm(llm_mode)
     
-    for _ in range(3): # Max cycles
-        res = llm.invoke(messages)
-        content = res.content.strip()
-        
-        # Coba parse JSON untuk eksekusi Tool
-        if content.startswith('{') and content.endswith('}'):
-            try:
-                data = json.loads(content)
-                action = data.get("action")
-                action_input = data.get("action_input", {})
-                
-                if action in TOOL_DISPATCHER:
-                    used_tools.append(action)
-                    try:
-                        observation = TOOL_DISPATCHER[action](**action_input)
-                        messages.append(HumanMessage(content=f"Data RAG / API berhasil ditarik. Hasil untuk tool {action}:\n{observation}\n\nSekarang, berikan jawaban akhir yang ramah kepada pengguna berdasarkan data di atas."))
-                    except Exception as e:
-                        messages.append(HumanMessage(content=f"Gagal menjalankan tool {action} karena error: {str(e)}. Coba jawab tanpa tool ini atau perbaiki argumenmu."))
-                    continue
-            except json.JSONDecodeError:
-                pass
-                
-        # Jika AI mengeluarkan teks bahasa natural (bukan JSON tulen) atau tool tidak ada
-        # Anggap ini sebagai final answer dan keluar dari loop mempercepat respons!
-        return content, used_tools
+    try:
+        for _ in range(3): # Max cycles
+            res = llm.invoke(messages)
+            content = res.content.strip() if hasattr(res, "content") else str(res).strip()
+            
+            # Coba parse JSON untuk eksekusi Tool
+            if content.startswith('{') and content.endswith('}'):
+                try:
+                    data = json.loads(content)
+                    action = data.get("action")
+                    action_input = data.get("action_input", {})
+                    
+                    if action in TOOL_DISPATCHER:
+                        used_tools.append(action)
+                        try:
+                            observation = TOOL_DISPATCHER[action](**action_input)
+                            messages.append(HumanMessage(content=f"Data RAG / API berhasil ditarik. Hasil untuk tool {action}:\n{observation}\n\nSekarang, berikan jawaban akhir yang ramah kepada pengguna berdasarkan data di atas."))
+                        except Exception as e:
+                            messages.append(HumanMessage(content=f"Gagal menjalankan tool {action} karena error: {str(e)}. Coba jawab tanpa tool ini atau perbaiki argumenmu."))
+                        continue
+                except json.JSONDecodeError:
+                    pass
+                    
+            # Jika AI mengeluarkan teks bahasa natural (bukan JSON tulen) atau tool tidak ada
+            # Anggap ini sebagai final answer dan keluar dari loop mempercepat respons!
+            return content, used_tools
+    except Exception as e:
+        error_str = str(e)
+        if "GOOGLE_API_KEY_MISSING" in error_str:
+            return "Maaf, sistem dikonfigurasi menggunakan Google Gemini API, namun GOOGLE_API_KEY belum diatur. Dapatkan API Key gratis di https://aistudio.google.com/ dan masukkan ke file .env.", []
+        elif "401" in error_str or "Unauthorized" in error_str:
+            return "Maaf, API Key Anda tidak valid. Silakan periksa kembali kredensial Anda di file .env.", []
+        elif "429" in error_str or "rate limit" in error_str.lower():
+            return "Maaf, batas penggunaan (rate limit) API telah tercapai. Silakan coba lagi nanti.", []
+        else:
+            return f"Terjadi kesalahan internal API: {error_str}", []
 
     return content, used_tools
 
@@ -226,7 +248,7 @@ def ambil_profil_petani():
             return json.loads(encryptor.decrypt(f.read()))
     except: return None
 
-llm_final = RunnableLambda(lambda x: ask_chatbot(x.to_string() if hasattr(x, "to_string") else str(x))[0])
+llm_final = RunnableLambda(lambda x: ask_chatbot(x.to_string() if hasattr(x, "to_string") else str(x), "local")[0])
 
 if __name__ == "__main__":
     print(ask_chatbot("Berapa harga cabai di Malang?"))

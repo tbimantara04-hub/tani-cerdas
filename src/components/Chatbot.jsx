@@ -13,6 +13,7 @@ const Chatbot = forwardRef((props, ref) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [llmMode, setLlmMode] = useState(() => localStorage.getItem('llmMode') || 'local');
     const messagesEndRef = useRef(null);
     const recognitionRef = useRef(null);
 
@@ -48,6 +49,10 @@ const Chatbot = forwardRef((props, ref) => {
             stopSpeaking();
         };
     }, []);
+
+    useEffect(() => {
+        localStorage.setItem('llmMode', llmMode);
+    }, [llmMode]);
 
     const toggleListening = () => {
         if (isListening) {
@@ -139,7 +144,8 @@ const Chatbot = forwardRef((props, ref) => {
 
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/chat', {
-                message: userMessage
+                message: userMessage,
+                llm_mode: llmMode
             });
             
             // SANITIZATION: Handle potential array/object responses from bot
@@ -157,7 +163,10 @@ const Chatbot = forwardRef((props, ref) => {
             return sanitizedText;
         } catch (error) {
             console.error("Error communicating with chatbot:", error);
-            const errorText = "Maaf, terjadi kesalahan saat menghubungi server.";
+            let errorText = "Maaf, terjadi kesalahan saat menghubungi server.";
+            if (error.response && error.response.data && error.response.data.detail) {
+                errorText = `Error dari server: ${error.response.data.detail}`;
+            }
             const errorMsg = { id: Date.now() + 1, text: errorText, sender: "bot" };
             setMessages(prev => [...prev, errorMsg]);
             return errorText;
@@ -272,6 +281,32 @@ const Chatbot = forwardRef((props, ref) => {
                                 <Bot size={24} />
                                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold', color: 'white' }}>Tani-Cerdas AI</h3>
                             </div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '20px', padding: '2px 4px', margin: '0 8px' }}>
+                                <button 
+                                    onClick={() => setLlmMode('local')}
+                                    style={{ 
+                                        background: llmMode === 'local' ? 'white' : 'transparent', 
+                                        color: llmMode === 'local' ? '#2D5A27' : 'white',
+                                        border: 'none', borderRadius: '16px', padding: '4px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    💻 Local
+                                </button>
+                                <button 
+                                    onClick={() => setLlmMode('api')}
+                                    style={{ 
+                                        background: llmMode === 'api' ? 'white' : 'transparent', 
+                                        color: llmMode === 'api' ? '#2D5A27' : 'white',
+                                        border: 'none', borderRadius: '16px', padding: '4px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    ☁️ API
+                                </button>
+                            </div>
+
                             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                                 {isSpeaking && (
                                     <button 

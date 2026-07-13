@@ -49,6 +49,7 @@ def load_decrypted_data(file_path):
 
 class ChatRequest(BaseModel):
     message: str
+    llm_mode: str = "local"
 
 class ChatResponse(BaseModel):
     response: str
@@ -65,7 +66,7 @@ def chat(request: ChatRequest):
         if not request.message:
             raise HTTPException(status_code=400, detail="Message cannot be empty")
         
-        bot_result = ask_chatbot(request.message)
+        bot_result = ask_chatbot(request.message, request.llm_mode)
         bot_response = bot_result[0] if isinstance(bot_result, tuple) else bot_result
         
         # Simpan riwayat chat secara terenkripsi

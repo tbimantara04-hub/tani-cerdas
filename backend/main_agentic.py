@@ -138,6 +138,7 @@ def start_background_monitoring():
 class ChatRequest(BaseModel):
     message: str
     farmer_id: str = "default"
+    llm_mode: str = "local"
 
 class ChatResponse(BaseModel):
     response: str
@@ -211,7 +212,8 @@ def chat(request: ChatRequest):
             orch.set_farmer_profile(request.farmer_id, profile)
         
         # Process query through orchestrator
-        result = orch.process_query(request.message, request.farmer_id)
+        # Add llm_mode to kwargs to pass down to agents if needed in future
+        result = orch.process_query(request.message, request.farmer_id, llm_mode=request.llm_mode)
         
         bot_response = result.get("response", "No response")
         primary_agent = result.get("primary_agent", "unknown")
