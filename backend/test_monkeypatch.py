@@ -1,17 +1,14 @@
-import sys
-from types import ModuleType
-
-try:
-    import google.generativeai.plugins
-except ImportError:
-    m = ModuleType("google.generativeai.plugins")
-    m.get_plugins = lambda: []
-    sys.modules["google.generativeai.plugins"] = m
-
-from langchain_google_genai import ChatGoogleGenerativeAI
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 
 load_dotenv("backend/.env")
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+api_key = os.getenv("GITHUB_TOKEN")
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    api_key=api_key,
+    base_url="https://models.inference.ai.azure.com",
+    temperature=0.1
+)
 print(llm.invoke("Hi").content)

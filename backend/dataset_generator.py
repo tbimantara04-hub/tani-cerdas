@@ -3,6 +3,7 @@ import json
 import time
 import sys
 from dotenv import load_dotenv
+from openai import OpenAI
 
 def log(msg):
     with open("backend/gen_debug.log", "a", encoding="utf-8") as f:
@@ -12,14 +13,16 @@ def log(msg):
 try:
     log("Starting dataset generator...")
     load_dotenv("backend/.env")
-    API_KEY = os.getenv("GOOGLE_API_KEY")
+    API_KEY = os.getenv("GITHUB_TOKEN")
     if not API_KEY:
-        log("ERROR: GOOGLE_API_KEY not found in .env")
+        log("ERROR: GITHUB_TOKEN not found in .env")
         sys.exit(1)
         
-    import google.generativeai as genai
-    genai.configure(api_key=API_KEY)
-    log("Google AI configured.")
+    client = OpenAI(
+        base_url="https://models.inference.ai.azure.com",
+        api_key=API_KEY
+    )
+    log("GitHub Models OpenAI client configured.")
 
     def generate_queries(category, count=20):
         prompt = f"""Buatkan dataset berisi {count} pertanyaan unik petani dalam bahasa Indonesia untuk AI asisten "Tani Cerdas".
@@ -37,11 +40,15 @@ Format JSON (List of Objects):
 
 Berikan output HANYA JSON array tanpa teks penjelasan apapun."""
 
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
         try:
             log(f"Requesting {count} queries for {category}...")
-            response = model.generate_content(prompt)
-            content = response.text.strip()
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            content = response.choices[0].message.content.strip()
             log(f"Received response for {category}. Length: {len(content)}")
             
             start = content.find('[')

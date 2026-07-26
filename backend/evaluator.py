@@ -1,34 +1,41 @@
 import json
 import os
 import time
-import requests
+import re
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load env
 load_dotenv("backend/.env")
-google_api_key = os.getenv("GOOGLE_API_KEY")
+github_token = os.getenv("GITHUB_TOKEN")
 
-def call_gemini_rest(prompt, model="qwen2.5:14b", retries=3):
-    url = "http://localhost:11434/api/generate"
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": False
-    }
+client = OpenAI(
+    base_url="https://models.inference.ai.azure.com",
+    api_key=github_token
+)
+
+def call_github_model_api(prompt, model="gpt-4o-mini", retries=3):
+    if not github_token:
+        print("ERROR: GITHUB_TOKEN not found in .env")
+        return "Error: GITHUB_TOKEN_MISSING"
+        
     for i in range(retries):
         try:
-            response = requests.post(url, json=payload, timeout=120)
-            if response.status_code == 200:
-                res_json = response.json()
-                if 'response' in res_json:
-                    return res_json['response']
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.1
+            )
+            return response.choices[0].message.content.strip()
         except Exception as e:
-            pass
-        time.sleep(2)
+            print(f"Error calling GitHub Model API (attempt {i+1}): {e}")
+            time.sleep(2)
     return "Error"
 
 def get_llm_score(query, ideal, system_response):
-    """Uses Gemini REST as a judge to score semantic accuracy (0-10)."""
+    """Uses GitHub Models API as a judge to score semantic accuracy (0-10)."""
     if not system_response or "Error" in system_response:
         return 0
     
@@ -48,8 +55,7 @@ def get_llm_score(query, ideal, system_response):
     Skor: [angka]
     """
     
-    res_text = call_gemini_rest(prompt)
-    import re
+    res_text = call_github_model_api(prompt)
     match = re.search(r"Skor[: ]*(\d+)", res_text, re.IGNORECASE)
     if match:
         return int(match.group(1))
@@ -74,7 +80,7 @@ def main():
     with open(results_path, "r", encoding="utf8") as f:
         data = json.load(f)
 
-    print(f"Evaluating {len(data)} results using REST API Judge...")
+    print(f"Evaluating {len(data)} results using GitHub Model API Judge...")
     evaluated_data = []
     
     for i, row in enumerate(data):

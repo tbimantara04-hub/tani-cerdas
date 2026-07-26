@@ -23,23 +23,42 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama import ChatOllama, OllamaEmbeddings
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 import glob
+import re
 
-load_dotenv()
-# Tidak lagi membutuhkan GOOGLE_API_KEY untuk Qwen, tapi security.py mungkin butuh ENCRYPTION_KEY
+def extract_json_objects(text):
+    objs = []
+    stack = []
+    start_idx = -1
+    for i, char in enumerate(text):
+        if char == '{':
+            if not stack:
+                start_idx = i
+            stack.append(char)
+        elif char == '}':
+            if stack:
+                stack.pop()
+                if not stack:
+                    objs.append(text[start_idx:i+1])
+    return objs
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+# Menggunakan GITHUB_TOKEN untuk model cloud (GitHub Models API)
 
 # ============================================================
-# LLM — Dynamic Selection (Ollama or Google Gemini API)
+# LLM — Dynamic Selection (Ollama or GitHub Models API)
 # ============================================================
 def get_llm(llm_mode="local"):
     if llm_mode == "api":
-        google_api_key = os.environ.get("GOOGLE_API_KEY")
-        if not google_api_key or google_api_key == "your_gemini_api_key_here":
-            raise ValueError("GOOGLE_API_KEY_MISSING")
-        return ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+        github_token = os.environ.get("GITHUB_TOKEN")
+        if not github_token or github_token == "your_github_pat_here":
+            raise ValueError("GITHUB_TOKEN_MISSING")
+        return ChatOpenAI(
+            model="gpt-4o-mini",
+            api_key=github_token,
+            base_url="https://models.inference.ai.azure.com",
             temperature=0.1
         )
     return ChatOllama(
@@ -205,35 +224,42 @@ def ask_chatbot(query: str, llm_mode: str = "local"):
             res = llm.invoke(messages)
             content = res.content.strip() if hasattr(res, "content") else str(res).strip()
             
-            # Coba parse JSON untuk eksekusi Tool
-            if content.startswith('{') and content.endswith('}'):
-                try:
-                    data = json.loads(content)
-                    action = data.get("action")
-                    action_input = data.get("action_input", {})
-                    
-                    if action in TOOL_DISPATCHER:
-                        used_tools.append(action)
-                        try:
-                            observation = TOOL_DISPATCHER[action](**action_input)
-                            messages.append(HumanMessage(content=f"Data RAG / API berhasil ditarik. Hasil untuk tool {action}:\n{observation}\n\nSekarang, berikan jawaban akhir yang ramah kepada pengguna berdasarkan data di atas."))
-                        except Exception as e:
-                            messages.append(HumanMessage(content=f"Gagal menjalankan tool {action} karena error: {str(e)}. Coba jawab tanpa tool ini atau perbaiki argumenmu."))
-                        continue
-                except json.JSONDecodeError:
-                    pass
+            # Coba cari blok JSON di dalam konten respon (bisa lebih dari satu)
+            json_blocks = extract_json_objects(content)
+            if json_blocks:
+                has_executed_any = False
+                for block in json_blocks:
+                    try:
+                        data = json.loads(block)
+                        action = data.get("action")
+                        action_input = data.get("action_input", {})
+                        
+                        if action in TOOL_DISPATCHER:
+                            used_tools.append(action)
+                            has_executed_any = True
+                            try:
+                                observation = TOOL_DISPATCHER[action](**action_input)
+                                messages.append(HumanMessage(content=f"Data RAG / API berhasil ditarik untuk tool {action}:\n{observation}"))
+                            except Exception as e:
+                                messages.append(HumanMessage(content=f"Gagal menjalankan tool {action} karena error: {str(e)}."))
+                    except json.JSONDecodeError:
+                        pass
+                
+                if has_executed_any:
+                    messages.append(HumanMessage(content="Semua data di atas telah berhasil ditarik. Sekarang, berikan jawaban akhir Bahasa Indonesia yang ramah, komprehensif, dan tepat kepada pengguna berdasarkan data tersebut."))
+                    continue
                     
             # Jika AI mengeluarkan teks bahasa natural (bukan JSON tulen) atau tool tidak ada
             # Anggap ini sebagai final answer dan keluar dari loop mempercepat respons!
             return content, used_tools
     except Exception as e:
         error_str = str(e)
-        if "GOOGLE_API_KEY_MISSING" in error_str:
-            return "Maaf, sistem dikonfigurasi menggunakan Google Gemini API, namun GOOGLE_API_KEY belum diatur. Dapatkan API Key gratis di https://aistudio.google.com/ dan masukkan ke file .env.", []
+        if "GITHUB_TOKEN_MISSING" in error_str:
+            return "Maaf, sistem dikonfigurasi menggunakan GitHub Models API, namun GITHUB_TOKEN belum diatur. Masukkan Token Anda ke file .env.", []
         elif "401" in error_str or "Unauthorized" in error_str:
-            return "Maaf, API Key Anda tidak valid. Silakan periksa kembali kredensial Anda di file .env.", []
+            return "Maaf, GITHUB_TOKEN Anda tidak valid atau tidak memiliki akses ke model. Silakan periksa kembali kredensial Anda di file .env.", []
         elif "429" in error_str or "rate limit" in error_str.lower():
-            return "Maaf, batas penggunaan (rate limit) API telah tercapai. Silakan coba lagi nanti.", []
+            return "Maaf, batas penggunaan (rate limit) API GitHub Models telah tercapai. Silakan coba lagi nanti.", []
         else:
             return f"Terjadi kesalahan internal API: {error_str}", []
 

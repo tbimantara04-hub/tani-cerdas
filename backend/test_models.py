@@ -1,16 +1,21 @@
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 
 load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
+api_key = os.getenv("GITHUB_TOKEN")
 
-models_to_test = ["gemini-1.5-flash", "gemini-2.0-flash-exp", "gemini-pro"]
+models_to_test = ["gpt-4o-mini", "gpt-4o", "meta-llama-3.1-405b-instruct"]
 
 for model in models_to_test:
     try:
         print(f"Testing model: {model}")
-        llm = ChatGoogleGenerativeAI(model=model, google_api_key=api_key)
+        llm = ChatOpenAI(
+            model=model,
+            api_key=api_key,
+            base_url="https://models.inference.ai.azure.com",
+            temperature=0.1
+        )
         response = llm.invoke("Say hello")
         print(f"Success with {model}: {response.content}")
         break

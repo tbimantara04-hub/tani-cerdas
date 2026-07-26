@@ -1,24 +1,23 @@
 import os
-import google.generativeai as genai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+api_key = os.getenv("GITHUB_TOKEN")
 
-model_name = "gemini-1.5-flash"
-try:
-    print(f"Testing {model_name} with genai...")
-    model = genai.GenerativeModel(model_name)
-    response = model.generate_content("Say hello")
-    print(f"Success: {response.text}")
-except Exception as e:
-    print(f"Failed: {e}")
+client = OpenAI(
+    base_url="https://models.inference.ai.azure.com",
+    api_key=api_key
+)
 
-model_name = "gemini-1.5-flash-latest"
 try:
-    print(f"Testing {model_name} with genai...")
-    model = genai.GenerativeModel(model_name)
-    response = model.generate_content("Say hello")
-    print(f"Success: {response.text}")
+    print("Testing gpt-4o-mini with openai SDK on GitHub Models...")
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "user", "content": "Say hello"}
+        ]
+    )
+    print(f"Success: {response.choices[0].message.content}")
 except Exception as e:
     print(f"Failed: {e}")

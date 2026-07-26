@@ -2,27 +2,52 @@ import json
 import time
 import os
 import sys
+from dotenv import load_dotenv
+from openai import OpenAI
 
 # Ensure backend dir is in path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+load_dotenv()
+github_token = os.getenv("GITHUB_TOKEN")
+
+client = OpenAI(
+    base_url="https://models.inference.ai.azure.com",
+    api_key=github_token
+)
 
 from rag_logic import (
     ask_chatbot, 
     tanya_panduan_hama, 
     cek_cuaca, 
     cek_harga_pangan, 
-    cek_harga_pupuk,
-    llm,
-    call_gemini_rest
+    cek_harga_pupuk
 )
 
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+def call_github_model_api(prompt, model="gpt-4o-mini", retries=3):
+    if not github_token:
+        print("ERROR: GITHUB_TOKEN not found in .env")
+        return "Error: GITHUB_TOKEN_MISSING"
+        
+    for i in range(retries):
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.1
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"Error calling GitHub Model API (attempt {i+1}): {e}")
+            time.sleep(2)
+    return "Error"
 
 # 1. Standard RAG (Only Vector DB via tanya_panduan_hama)
 def run_standard_rag(query):
     try:
-        return tanya_panduan_hama.invoke(query)
+        return tanya_panduan_hama(query)
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -31,10 +56,10 @@ def run_standard_rag(query):
 # 2. Static Multi-tool (Call all tools and ask LLM to synthesize)
 def run_static_multi_tool(query):
     try:
-        hama_res = tanya_panduan_hama.invoke(query)
-        cuaca_res = cek_cuaca.invoke("")
-        harga_pangan_res = cek_harga_pangan.invoke("")
-        harga_pupuk_res = cek_harga_pupuk.invoke("")
+        hama_res = tanya_panduan_hama(query)
+        cuaca_res = cek_cuaca("")
+        harga_pangan_res = cek_harga_pangan("")
+        harga_pupuk_res = cek_harga_pupuk("")
         
         context = f"""
         [KONTEKS PANDUAN PERTANIAN]: {hama_res}
@@ -43,7 +68,6 @@ def run_static_multi_tool(query):
         [KONTEKS HARGA PUPUK]: {harga_pupuk_res}
         """
         
-        # Use direct REST call instead of chain to avoid extra overhead
         prompt_text = f"""Anda adalah asisten Tani-Cerdas. Jawab pertanyaan pengguna berdasarkan KONTEKS.
         
 KONTEKS:
@@ -53,7 +77,7 @@ PERTANYAAN: {query}
 
 JAWABAN (Bahasa Indonesia):"""
         
-        return call_gemini_rest(prompt_text)
+        return call_github_model_api(prompt_text)
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -62,7 +86,7 @@ JAWABAN (Bahasa Indonesia):"""
 # 3. Agentic RAG (Live system using keyword-based tool selection)
 def run_agentic_rag(query):
     try:
-        return ask_chatbot(query)
+        return ask_chatbot(query, llm_mode="api")  # Use the GitHub Models API mode
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -116,7 +140,7 @@ def main():
         print(f"     {is_ok} ({row['standard_rag_time']:.1f}s)")
         
         # Wait between methods to respect rate limit
-        time.sleep(8)
+        time.sleep(2)
         
         # 2. Static Multi-tool
         print(f"  -> Static Multi-tool...")
@@ -127,7 +151,7 @@ def main():
         print(f"     {is_ok} ({row['static_multi_tool_time']:.1f}s)")
         
         # Wait between methods
-        time.sleep(8)
+        time.sleep(2)
         
         # 3. Agentic RAG
         print(f"  -> Agentic RAG...")
@@ -150,8 +174,8 @@ def main():
         with open(results_path, "w", encoding="utf8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
             
-        print(f"  -> Saved. Waiting 10s before next query...")
-        time.sleep(10)
+        print(f"  -> Saved. Waiting 3s before next query...")
+        time.sleep(3)
             
     print(f"\n===== BENCHMARK COMPLETE =====")
     print(f"Total: {len(results)} queries processed")

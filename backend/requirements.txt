@@ -9,3 +9,6 @@ faiss-cpu
 python-dotenv
 google-generativeai
 cryptography==42.0.5
+openai
+langchain-openai
+

@@ -8,7 +8,7 @@ from rag_logic import ask_chatbot
 
 def test_query(query):
     print(f"\n--- Testing Query: {query} ---")
-    answer, tools = ask_chatbot(query)
+    answer, tools = ask_chatbot(query, llm_mode="api")
     print(f"Tools used: {tools}")
     print(f"Answer: {answer}")
 
