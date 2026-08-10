@@ -1,0 +1,815 @@
+[
+  {
+    "category": "Cuaca",
+    "query": "Bagaimana prakiraan cuaca besok di daerah saya, apakah akan hujan?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Besok diperkirakan cerah berawan dengan potensi hujan ringan sore hari di sebagian wilayah Anda."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Kapan kira-kira musim hujan akan mulai tahun ini di wilayah Jawa Tengah?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Musim hujan di Jawa Tengah diprediksi akan dimulai pada pertengahan Oktober hingga awal November."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah ada potensi kekeringan panjang dalam beberapa bulan ke depan di Lombok?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Ada indikasi curah hujan di bawah normal yang bisa memicu kekeringan di Lombok dalam 2-3 bulan ke depan."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Berapa suhu rata-rata dan kelembaban udara hari ini di lahan pertanian saya?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Suhu rata-rata hari ini sekitar 28°C dengan kelembaban 75%."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah aman untuk menyemprot pupuk daun besok pagi melihat prakiraan cuaca?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Besok pagi diperkirakan cerah tanpa hujan, sehingga aman untuk penyemprotan pupuk daun."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Ada peringatan angin kencang tidak untuk daerah pegunungan di sekitar kebun saya?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Saat ini belum ada peringatan angin kencang signifikan untuk daerah pegunungan Anda."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Bagaimana prediksi cuaca untuk tiga hari ke depan di Banyuwangi, apakah ada badai?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Cuaca di Banyuwangi tiga hari ke depan umumnya cerah berawan, tidak ada indikasi badai."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah ada informasi curah hujan yang tinggi di wilayah Sumatera Utara minggu ini?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Ya, beberapa daerah di Sumatera Utara diperkirakan mengalami curah hujan tinggi minggu ini."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Kapan waktu terbaik menanam jagung jika melihat ramalan cuaca untuk satu bulan ke depan?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Berdasarkan ramalan cuaca, pertengahan bulan depan adalah waktu terbaik menanam jagung karena curah hujan cukup."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah ada potensi embun upas di dataran tinggi Dieng dalam waktu dekat?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Ya, suhu malam hari di Dieng diprediksi turun drastis, meningkatkan potensi embun upas."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Bagaimana pengaruh El Nino terhadap pola hujan di daerah pertanian saya?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "El Nino cenderung mengurangi curah hujan dan memperpanjang musim kemarau di daerah Anda."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Berapa lama lagi perkiraan musim kemarau akan berlangsung di Pulau Madura?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Musim kemarau di Madura diperkirakan akan berlangsung hingga akhir Oktober."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah ada peringatan dini banjir untuk daerah aliran sungai dekat sawah saya?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Ada peringatan potensi banjir ringan untuk daerah aliran sungai Anda akibat intensitas hujan tinggi."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Bagaimana prakiraan cuaca untuk proses pengeringan hasil panen hari ini?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Hari ini cuaca cerah penuh dengan sinar matahari, sangat baik untuk pengeringan hasil panen."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah ada potensi kabut tebal yang bisa mengganggu panen besok pagi?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Besok pagi diprediksi ada potensi kabut tipis di beberapa area, namun tidak terlalu tebal."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Informasi cuaca untuk satu bulan ke depan di Kalimantan Selatan bagaimana?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Kalimantan Selatan diprediksi mengalami curah hujan moderat dengan beberapa hari cerah di bulan depan."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah suhu panas terik ini akan bertahan lama dan berpengaruh pada tanaman tomat saya?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Suhu terik diperkirakan bertahan 3-4 hari lagi. Pastikan penyiraman cukup untuk tanaman tomat Anda."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Kapan terakhir kali daerah saya menerima hujan yang cukup untuk mengisi irigasi?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Hujan yang cukup untuk irigasi terakhir terjadi sekitar 10 hari yang lalu."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Bagaimana prakiraan intensitas sinar UV hari ini di lokasi saya?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Intensitas sinar UV hari ini diperkirakan tinggi, disarankan untuk berhati-hati saat beraktivitas di luar."
+  },
+  {
+    "category": "Cuaca",
+    "query": "Apakah cuaca mendung dan berangin kencang ini pertanda akan turun hujan deras?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Ya, mendung tebal dan angin kencang seringkali menjadi indikasi akan turunnya hujan deras. Bersiaplah."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Berapa harga rata-rata cabai rawit merah hari ini di pasar induk Jakarta?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga rata-rata cabai rawit merah di pasar induk Jakarta hari ini berkisar Rp 55.000 - Rp 60.000 per kilogram."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Bagaimana tren harga bawang merah lokal saya selama sebulan terakhir?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Tren harga bawang merah di wilayah Anda cenderung stabil dengan sedikit kenaikan di akhir bulan, sekitar Rp 28.000 - Rp 32.000 per kilogram."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Tolong cek harga pupuk NPK bersubsidi dan non-subsidi di wilayah Jawa Timur.",
+    "expected_tools": [
+      "cek_harga_pangan",
+      "cek_harga_pupuk"
+    ],
+    "ideal_answer": "Harga pupuk NPK bersubsidi (Phonska) di Jawa Timur sesuai HET Rp 2.300/kg. Non-subsidi bervariasi antara Rp 6.000 - Rp 8.000/kg tergantung merek."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Apakah harga beras medium stabil atau ada perubahan signifikan minggu ini?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga beras medium cenderung stabil minggu ini di kisaran Rp 12.500 - Rp 13.000 per kilogram di sebagian besar pasar."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Bisakah saya membandingkan harga tomat di pasar lokal saya dengan pasar di kota terdekat?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga tomat di pasar lokal Anda sekitar Rp 8.000/kg. Sementara di kota terdekat, harga bisa mencapai Rp 9.500/kg."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Menurut data, bagaimana perkiraan harga jagung pipilan kering untuk panen berikutnya?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Perkiraan harga jagung pipilan kering untuk panen berikutnya diprediksi stabil atau sedikit menurun karena pasokan yang melimpah, sekitar Rp 4.500 - Rp 5.000 per kilogram."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Berapa harga bibit padi varietas Ciherang saat ini per kilogram?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga bibit padi varietas Ciherang saat ini berkisar antara Rp 12.000 - Rp 15.000 per kilogram, tergantung penyedia dan sertifikasi."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Informasi harga pestisida insektisida merk X di pasaran sekarang.",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga pestisida insektisida merk X ukuran 500ml saat ini di pasaran sekitar Rp 85.000 - Rp 100.000."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Kapan waktu terbaik untuk menjual hasil panen kentang agar mendapatkan harga tertinggi?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Waktu terbaik menjual kentang biasanya saat pasokan berkurang setelah musim panen raya atau menjelang hari raya besar, biasanya 1-2 bulan setelah puncak panen."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Faktor apa saja yang paling mempengaruhi fluktuasi harga sayuran hijau seperti bayam dan kangkung?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Fluktuasi harga sayuran hijau dipengaruhi oleh cuaca (hujan/panas), musim panen, biaya transportasi, serta permintaan pasar."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Coba cek harga ubi jalar dan singkong di pasar tradisional minggu ini.",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga ubi jalar di pasar tradisional sekitar Rp 6.000 - Rp 8.000/kg dan singkong Rp 3.000 - Rp 4.500/kg minggu ini."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Untuk petani kopi, bagaimana harga biji kopi robusta grade A saat ini di sentra produksi?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga biji kopi robusta grade A di sentra produksi saat ini berkisar Rp 28.000 - Rp 32.000 per kilogram."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Bagaimana cara mendapatkan informasi terbaru mengenai kuota dan harga pupuk bersubsidi?",
+    "expected_tools": [
+      "cek_harga_pangan",
+      "cek_harga_pupuk"
+    ],
+    "ideal_answer": "Informasi terbaru kuota dan harga pupuk bersubsidi bisa didapat melalui kelompok tani setempat, dinas pertanian, atau aplikasi resmi Kementerian Pertanian."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Berapa harga bawang putih kating dan sinai di pasar grosir Surabaya hari ini?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga bawang putih kating di pasar grosir Surabaya sekitar Rp 38.000 - Rp 42.000/kg, sedangkan sinai sekitar Rp 32.000 - Rp 36.000/kg."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Apakah cuaca ekstrem yang baru-baru ini terjadi akan berdampak pada harga cabai dalam waktu dekat?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Cuaca ekstrem berpotensi menyebabkan gagal panen atau penurunan kualitas, yang kemungkinan akan menaikkan harga cabai dalam beberapa minggu ke depan."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Berapa harga jual daun bawang dan seledri di tingkat petani sekarang?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga jual daun bawang di tingkat petani sekitar Rp 6.000 - Rp 8.000/kg, dan seledri Rp 7.000 - Rp 9.000/kg."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Bisa Tani Cerdas menunjukkan harga gabah kering panen (GKP) di berbagai provinsi produsen padi?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga GKP bervariasi, misalnya di Jawa Barat sekitar Rp 5.800-6.200/kg, Jawa Timur Rp 5.700-6.100/kg, dan Sumatera Selatan Rp 5.900-6.300/kg."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Informasi harga kedelai impor dan lokal per kilogram di tingkat pengepul.",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga kedelai impor di tingkat pengepul sekitar Rp 13.500 - Rp 14.000/kg. Kedelai lokal cenderung lebih tinggi, sekitar Rp 15.000 - Rp 16.000/kg."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Selain pupuk kimia, apakah ada data harga pupuk organik atau kompos per karung?",
+    "expected_tools": [
+      "cek_harga_pangan",
+      "cek_harga_pupuk"
+    ],
+    "ideal_answer": "Harga pupuk organik atau kompos per karung (25-50 kg) bervariasi antara Rp 30.000 - Rp 75.000, tergantung jenis dan produsen."
+  },
+  {
+    "category": "Harga Pasar",
+    "query": "Untuk komoditas musiman seperti durian, bagaimana proyeksi harga saat musim panen raya nanti?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Proyeksi harga durian saat musim panen raya cenderung menurun karena pasokan melimpah, perkiraan harga di tingkat petani bisa turun 15-25% dari harga normal."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Padi saya daunnya menguning, ada bintik-bintik cokelat kecil. Itu kira-kira penyakit apa ya dan bagaimana cara mengatasinya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Gejala tersebut bisa jadi menunjukkan penyakit blas atau bercak daun. Untuk penanganan lebih lanjut, perlu identifikasi lebih detail. Anda bisa menggunakan fungisida yang direkomendasikan."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Hama wereng sudah mulai menyerang tanaman jagung saya. Apa pestisida yang ampuh untuk membasminya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Untuk wereng pada jagung, Anda bisa mencoba insektisida dengan bahan aktif seperti buprofezin atau etofenprox. Pastikan dosis sesuai anjuran."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Tanaman cabai saya tiba-tiba layu dan akarnya membusuk. Apa ini penyakit fusarium? Pencegahannya bagaimana?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Gejala layu dan busuk akar pada cabai memang sering disebabkan fusarium. Pencegahannya bisa dengan penggunaan bibit tahan penyakit, perbaikan drainase, dan rotasi tanaman."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Bagaimana cara mengenali gejala awal serangan ulat grayak pada tanaman bawang merah?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Gejala awal ulat grayak adalah adanya lubang-lubang bekas gigitan pada daun, terutama daun muda, serta kotoran hitam di sekitar tanaman."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Saya menanam tomat dan sering diserang kutu kebul. Apa solusi organik untuk mengusir hama ini?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Untuk kutu kebul secara organik, Anda bisa menyemprotkan larutan sabun deterjen, minyak mimba (neem oil), atau menggunakan perangkap kuning lengket."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Apa perbedaan antara penyakit busuk batang dan busuk pangkal batang pada tanaman kelapa sawit?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Busuk batang menyerang bagian tengah batang, sementara busuk pangkal batang menyerang area dekat tanah. Keduanya disebabkan jamur Ganoderma namun dengan lokasi serangan yang berbeda."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Musim hujan begini, apa saja penyakit jamur yang sering menyerang tanaman sayuran seperti kangkung dan bayam?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Pada musim hujan, kangkung dan bayam rentan terhadap penyakit rebah semai, karat putih, atau bercak daun. Pastikan drainase baik dan jangan terlalu padat menanamnya."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Tanaman durian saya daunnya ada bercak hitam dan rontok. Kira-kira itu penyakit apa dan bagaimana mengatasinya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Bercak hitam dan rontok pada daun durian bisa jadi antraknosa atau bercak daun. Coba gunakan fungisida berbahan aktif tembaga atau mankozeb, dan buang daun yang terinfeksi."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Bagaimana cara mencegah penyebaran penyakit mozaik pada tanaman mentimun?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Penyakit mozaik disebarkan oleh serangga vektor seperti kutu daun. Pencegahannya meliputi pengendalian vektor, penggunaan varietas tahan, dan sanitasi kebun yang baik."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Saya melihat ada benjolan-benjolan pada akar tanaman kacang panjang saya. Itu hama atau penyakit apa ya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Benjolan pada akar kacang panjang bisa jadi bintil akar nitrogen (menguntungkan) atau nematoda puru akar (merugikan). Jika merugikan, gejalanya biasanya disertai tanaman kerdil atau layu. Pengendalian bisa dengan nematisida."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Apa saja tanda-tanda serangan hama penggerek batang pada tanaman padi dan bagaimana cara pengendaliannya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Tanda serangan penggerek batang padi adalah adanya gejala 'sundep' (pucuk layu) pada fase vegetatif atau 'beluk' (malai kosong) pada fase generatif. Pengendalian bisa dengan pestisida selektif, penanaman serentak, atau penggunaan musuh alami."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Bagaimana cara mengenali penyakit kresek (hawar daun bakteri) pada padi dan apa penanggulangannya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Penyakit kresek ditandai dengan bercak kebasahan pada tepi daun yang kemudian meluas dan mengering. Penanggulangannya bisa dengan varietas tahan, penggunaan antibiotik pertanian, atau pengaturan jarak tanam."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Tanaman sawit saya diserang ulat api. Bagaimana cara membasminya agar tidak menyebar?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Untuk ulat api pada sawit, Anda bisa menggunakan insektisida kontak atau sistemik yang sesuai. Lakukan penyemprotan secara merata dan pantau perkembangannya."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Penyakit keriting daun pada singkong disebabkan oleh apa dan apakah ada obatnya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Penyakit keriting daun singkong disebabkan oleh virus. Tidak ada obatnya, tapi bisa dicegah dengan penggunaan bibit sehat, pengendalian vektor (kutu kebul), dan eradikasi tanaman terinfeksi."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Bagaimana cara membuat pestisida nabati dari daun nimba untuk mengendalikan hama?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Untuk membuat pestisida nabati dari daun nimba, Anda bisa menumbuk daun nimba, merendamnya dalam air semalaman, lalu menyaringnya dan menyemprotkan larutannya pada tanaman."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Apa itu penyakit 'embun tepung' pada tanaman buah-buahan dan bagaimana cara mengatasinya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "'Embun tepung' adalah penyakit jamur yang ditandai lapisan putih seperti tepung pada daun dan buah. Atasinya dengan fungisida kontak atau sistemik, serta perbaikan sirkulasi udara."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Bagaimana cara membedakan serangan tikus dan hama babi hutan pada tanaman?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Tikus biasanya meninggalkan bekas gigitan kecil pada batang atau buah yang lebih rendah, sementara babi hutan akan membuat kerusakan lebih besar, seperti menggali tanah dan merusak akar atau umbi."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Ada jamur berwarna putih seperti kapas di pangkal batang tanaman kakao saya. Itu penyakit apa ya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Jamur putih seperti kapas di pangkal batang kakao bisa jadi penyakit busuk pangkal batang yang disebabkan oleh Ganoderma. Segera singkirkan bagian terinfeksi dan aplikasikan fungisida."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Apa saja tindakan pencegahan terbaik untuk menghindari serangan hama penggerek buah kakao (PBK)?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Pencegahan PBK meliputi panen sering (sanitasi), pemangkasan teratur, penggunaan feromon perangkap, dan penyemprotan insektisida jika diperlukan."
+  },
+  {
+    "category": "Penyakit & Hama",
+    "query": "Daun pada tanaman semangka saya mulai menguning dan ada benang-benang halus seperti sarang laba-laba di baliknya. Ini hama apa?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Gejala benang halus seperti sarang laba-laba dan daun menguning pada semangka biasanya disebabkan oleh tungau laba-laba. Gunakan akarisida untuk mengendalikannya."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Tanaman padi saya mulai menguning dan ada bintik-bintik hitam, ini hama apa ya? Besok perkiraan cuaca di daerah saya bagaimana?",
+    "expected_tools": [
+      "cek_cuaca",
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Tanaman padi Anda mungkin terserang blas atau hawar pelepah. Untuk besok, prakiraan cuaca di daerah Anda adalah cerah berawan dengan potensi hujan ringan di sore hari."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Berapa harga jual jagung hari ini di pasar terdekat? Dan berapa harga pupuk NPK mutiara sekarang?",
+    "expected_tools": [
+      "cek_cuaca",
+      "cek_harga_pangan",
+      "cek_harga_pupuk"
+    ],
+    "ideal_answer": "Harga jagung pipil kering hari ini di pasar terdekat sekitar Rp 4.500/kg. Harga pupuk NPK Mutiara 16-16-16 sekitar Rp 250.000/sak (50kg)."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Musim hujan ini sering sekali ada serangan ulat grayak di kebun bawang saya. Ada rekomendasi cara penanganannya? Apakah hujan akan berlanjut minggu depan?",
+    "expected_tools": [
+      "cek_cuaca",
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Untuk ulat grayak, Anda bisa gunakan insektisida biologi atau perangkap feromon. Prediksi menunjukkan hujan akan berlanjut hingga 3-4 hari ke depan."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Daun tomat saya keriting dan menguning. Ini penyakit atau kurang nutrisi? Bagaimana cara mengatasinya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Daun tomat yang keriting dan menguning bisa jadi gejala virus kuning (TYLCV) atau kekurangan kalsium. Lakukan uji tanah dan segera buang tanaman terinfeksi."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Harga cabai rawit sedang bagus, kapan waktu terbaik untuk panen agar harganya stabil tinggi? Ada tips pasca panen?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga cabai rawit biasanya stabil tinggi saat pasokan berkurang. Panen pagi hari untuk kualitas terbaik dan simpan di tempat sejuk bersirkulasi udara baik."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Saya mau memupuk tanaman sawit, tapi takut hujan. Kapan waktu terbaik untuk pemupukan urea minggu ini berdasarkan prakiraan cuaca?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Berdasarkan prakiraan cuaca, hari Selasa dan Kamis diprediksi cerah. Ini waktu yang baik untuk pemupukan urea agar tidak tercuci air hujan."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Ada serangga kecil berwarna hijau menyerang pucuk kangkung saya, ini hama apa? Dan bagaimana cara memberantasnya?",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Serangga hijau kecil di kangkung kemungkinan adalah kutu daun (aphids). Anda bisa menyemprotkan larutan sabun atau insektisida nabati."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Untuk musim tanam berikutnya, komoditas apa yang prospek harganya bagus menurut tren pasar? Tolong cek harga beras dan gula saat ini.",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Untuk musim tanam berikutnya, komoditas umbi-umbian seperti singkong atau ubi jalar memiliki prospek harga stabil. Harga beras medium Rp 12.000/kg, gula pasir Rp 17.000/kg."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Prediksi cuaca beberapa hari ke depan akan hujan lebat, apakah ini berpotensi memicu penyakit jamur pada tanaman kentang saya? Apa yang bisa saya lakukan?",
+    "expected_tools": [
+      "cek_cuaca",
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Hujan lebat memang meningkatkan risiko penyakit jamur seperti busuk daun. Lakukan penyemprotan fungisida preventif dan pastikan drainase lahan baik."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Pupuk KNO3 sulit dicari sekarang, apakah ada rekomendasi alternatif dengan fungsi yang mirip? Berapa harganya kalau ada?",
+    "expected_tools": [
+      "cek_harga_pangan",
+      "cek_harga_pupuk"
+    ],
+    "ideal_answer": "Sebagai alternatif KNO3, Anda bisa gunakan pupuk MKP (Mono Kalium Fosfat) yang kaya kalium dan fosfat. Harga MKP sekitar Rp 100.000/kg."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Saya ingin mencari pestisida organik untuk kutu kebul pada terong, ada rekomendasi produk yang efektif? Apakah harganya terjangkau?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Untuk kutu kebul pada terong, Anda bisa mencoba neem oil atau insektisida berbahan aktif piretrin. Harganya bervariasi tergantung merek dan ketersediaan."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Biasanya harga bawang merah akan naik di bulan apa ya? Cek harga rata-rata sekarang di pasar lokal.",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga bawang merah umumnya naik tajam di bulan puasa dan lebaran atau saat musim hujan yang mengganggu panen. Harga rata-rata sekarang Rp 25.000/kg."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Kapan waktu yang pas untuk mulai tanam kedelai di wilayah saya berdasarkan pola curah hujan tahun ini?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Berdasarkan pola curah hujan, waktu terbaik tanam kedelai di wilayah Anda adalah awal musim kemarau (sekitar Mei-Juni) setelah hujan terakhir."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Berapa dosis pupuk majemuk yang tepat untuk tanaman jagung fase vegetatif? Sekalian cek harga pupuk dolomit.",
+    "expected_tools": [
+      "cek_harga_pangan",
+      "cek_harga_pupuk"
+    ],
+    "ideal_answer": "Dosis pupuk majemuk untuk jagung fase vegetatif sekitar 200-300 kg/ha. Harga pupuk dolomit sekitar Rp 70.000/sak (50kg)."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Saya curiga tanaman kopi saya kena karat daun. Apa saja gejala utamanya dan bagaimana cara pencegahannya? Apakah ada panduan lengkapnya?",
+    "expected_tools": [
+      "cek_cuaca",
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Gejala karat daun kopi meliputi bintik oranye di bawah daun. Pencegahan dengan varietas tahan dan fungisida. Ada panduan lengkap di modul 'Penanganan Karat Daun Kopi'."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Setelah panen kentang bulan depan, berapa kira-kira potensi harga jualnya di pasar? Ada info pasar yang membutuhkan kentang dalam jumlah besar?",
+    "expected_tools": [
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Potensi harga kentang setelah panen bulan depan diperkirakan stabil di Rp 8.000-Rp 10.000/kg. Beberapa pedagang besar di pasar induk mencari pasokan rutin."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Jika seminggu ke depan tidak ada hujan, apakah saya perlu meningkatkan frekuensi irigasi untuk tanaman padi saya yang baru berumur sebulan?",
+    "expected_tools": [
+      "cek_cuaca"
+    ],
+    "ideal_answer": "Ya, jika seminggu tidak hujan, sangat disarankan untuk meningkatkan frekuensi irigasi pada padi muda agar tidak stres kekeringan. Cek kelembaban tanah secara berkala."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Tanah di lahan saya cenderung asam, pupuk apa yang cocok untuk menetralkan pH dan meningkatkan kesuburan? Berapa harganya?",
+    "expected_tools": [
+      "cek_harga_pangan",
+      "cek_harga_pupuk"
+    ],
+    "ideal_answer": "Untuk tanah asam, pupuk yang cocok adalah dolomit atau kapur pertanian untuk menetralkan pH. Setelah itu, gunakan pupuk organik. Harga dolomit sekitar Rp 70.000/sak."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Bagaimana strategi pengelolaan hama terpadu (PHT) untuk tanaman kubis? Terutama untuk ulat plutella.",
+    "expected_tools": [
+      "tanya_panduan_hama"
+    ],
+    "ideal_answer": "Strategi PHT untuk kubis meliputi penggunaan varietas tahan, rotasi tanaman, musuh alami, dan pestisida selektif sesuai ambang batas serangan ulat plutella."
+  },
+  {
+    "category": "Kombinasi",
+    "query": "Tolong cek harga gabah kering panen hari ini. Lalu, apa saja tanda-tanda awal kekurangan air pada tanaman cabai? Dan perkiraan cuaca untuk 3 hari ke depan.",
+    "expected_tools": [
+      "cek_cuaca",
+      "cek_harga_pangan"
+    ],
+    "ideal_answer": "Harga gabah kering panen hari ini sekitar Rp 5.500/kg. Tanda kekurangan air pada cabai: daun layu di siang hari, pertumbuhan terhambat. Prakiraan cuaca 3 hari ke depan: cerah berawan dengan suhu 28-32°C."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Halo Tani Cerdas, saya mau menyimpan nama saya, Budi Santoso, ke dalam profil.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Baik, nama Anda Budi Santoso sudah saya catat dalam profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Bisa tolong simpan lokasi lahan pertanian saya di Desa Mekar Sari, Kecamatan Harapan Jaya?",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Lokasi lahan Anda di Desa Mekar Sari, Kecamatan Harapan Jaya, sudah tersimpan."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Tolong catat bahwa luas lahan yang saya garap sekitar 2,5 hektar.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Luas lahan 2,5 hektar sudah diperbarui dalam profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Komoditas utama yang saya tanam adalah jagung. Masukkan informasi ini ya.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Jagung telah ditambahkan sebagai komoditas utama Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Saya punya jenis tanah liat berpasir. Penting untuk dicatat ini.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Jenis tanah liat berpasir sudah tersimpan di profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Tolong simpan data bahwa saya sudah bertani selama 12 tahun.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Pengalaman bertani 12 tahun sudah saya catat dalam profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Sistem irigasi yang saya gunakan adalah irigasi tetes. Tolong tambahkan ke detail saya.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Sistem irigasi tetes sudah ditambahkan ke profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Biasanya saya dibantu oleh 4 pekerja musiman. Bisa dicatat?",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Informasi jumlah pekerja musiman 4 orang sudah disimpan."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Sumber air utama untuk lahan saya berasal dari sungai kecil dekat sini.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Sumber air dari sungai kecil sudah tercatat di profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Saya ingin Tani Cerdas tahu kalau saya menjual hasil panen ke pengepul lokal.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Akses pasar melalui pengepul lokal sudah ditambahkan ke profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Tolong catat bahwa lahan saya sering mengalami kekeringan saat musim kemarau.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Kondisi lahan sering kekeringan saat musim kemarau sudah saya catat."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Saya menargetkan panen 6 ton per hektar untuk musim tanam mendatang. Simpan target ini ya.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Target panen 6 ton/hektar sudah disimpan dalam profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Saya sering menggunakan pupuk NPK dan pupuk kandang. Apakah ini bisa dicatat?",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Penggunaan pupuk NPK dan pupuk kandang sudah dicatat."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Saya punya mesin pompa air dan alat semprot punggung. Tambahkan ke inventaris saya.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Mesin pompa air dan alat semprot punggung sudah ditambahkan ke profil peralatan Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Status kepemilikan lahan yang saya garap adalah sewa jangka panjang.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Status kepemilikan lahan 'sewa jangka panjang' sudah disimpan."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Tolong simpan nomor telepon saya 08512345678 untuk kontak.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Nomor telepon 08512345678 sudah saya catat dalam profil Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Bisakah Tani Cerdas mengingat bahwa di lahan saya sering muncul penyakit blas pada padi?",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Baik, catatan tentang penyakit blas pada padi yang sering muncul sudah saya tambahkan ke profil lahan Anda."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Saya ingin Tani Cerdas menyimpan tujuan pertanian saya yaitu meningkatkan efisiensi penggunaan air.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Tujuan pertanian untuk meningkatkan efisiensi penggunaan air Anda sudah saya simpan."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Tolong simpan preferensi saya, saya ingin notifikasi mengenai harga pupuk via SMS.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Preferensi notifikasi harga pupuk via SMS sudah tersimpan."
+  },
+  {
+    "category": "Profil Petani",
+    "query": "Catat ya, saya ini petani milenial yang baru merintis 3 tahun terakhir.",
+    "expected_tools": [
+      "simpan_profil_petani"
+    ],
+    "ideal_answer": "Informasi sebagai petani milenial yang merintis 3 tahun terakhir sudah saya simpan."
+  }
+]

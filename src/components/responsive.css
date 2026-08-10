@@ -1,0 +1,288 @@
+/* Responsive Grid Utilities */
+
+/* 2-Column Grid */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 599px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 767px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* 3-Column Grid */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 767px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Responsive Forecast Cards */
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 479px) {
+  .forecast-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .forecast-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .forecast-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (min-width: 992px) {
+  .forecast-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* Responsive Flex Container */
+.flex-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .flex-responsive {
+    flex-direction: row;
+    gap: 20px;
+  }
+}
+
+/* Responsive Tabs */
+.tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 479px) {
+  .tabs-container {
+    gap: 6px;
+  }
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+@media (max-width: 479px) {
+  .tab-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .tab-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Weather Card Header */
+.weather-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .weather-header {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+/* Info Box Responsive */
+.info-box {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 599px) {
+  .info-box {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 991px) {
+  .info-box {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (min-width: 992px) {
+  .info-box {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Responsive Button */
+.btn-responsive {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+@media (max-width: 479px) {
+  .btn-responsive {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .btn-responsive {
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+}
+
+/* Responsive Text */
+.text-responsive-lg {
+  font-size: 20px;
+}
+
+@media (max-width: 479px) {
+  .text-responsive-lg {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .text-responsive-lg {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 992px) {
+  .text-responsive-lg {
+    font-size: 28px;
+  }
+}
+
+/* Hide on Mobile */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: block;
+  }
+}
+
+/* Hide on Desktop */
+.hide-desktop {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none;
+  }
+}
+
+/* Responsive List */
+.responsive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .responsive-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
