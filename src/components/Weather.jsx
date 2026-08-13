@@ -6,8 +6,7 @@ const Weather = () => {
     const [current, setCurrent] = useState(null);
     const [forecast, setForecast] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const API_KEY = "***REMOVED***";
+    const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "";
 
     useEffect(() => {
         const fetchData = async (lat, lon, cityName) => {

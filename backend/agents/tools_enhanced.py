@@ -60,7 +60,7 @@ class WeatherTool(EnhancedTool):
             name="cek_cuaca",
             description="Get real-time weather data for a location"
         )
-        self.api_key = "***REMOVED***"
+        self.api_key = os.environ.get("OPENWEATHER_API_KEY", "")
         self.cache = {}
         self.cache_duration = 3600  # 1 hour
         

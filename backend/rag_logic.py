@@ -143,7 +143,7 @@ def cek_cuaca(lokasi: str = "") -> str:
         else:
             lokasi = "Jakarta"
     try:
-        api_key = "***REMOVED***"
+        api_key = os.environ.get("OPENWEATHER_API_KEY", "")
         url = f"https://api.openweathermap.org/data/2.5/weather?q={lokasi}&appid={api_key}&units=metric&lang=id"
         res = requests.get(url, timeout=5)
         if res.status_code == 200:
