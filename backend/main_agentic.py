@@ -53,6 +53,7 @@ FARMER_PROFILE_FILE = "storage/farmer_profile.json"
 # Background monitoring thread
 monitoring_thread = None
 monitoring_active = False
+_stop_event = threading.Event()
 
 def save_encrypted_data(file_path, data):
     """Save encrypted data to file."""
@@ -118,10 +119,9 @@ def save_farmer_profile(farmer_id: str, profile: dict):
 
 def background_monitoring():
     """Monitor farmers in background."""
-    global monitoring_active
     print("[Background] Starting farmer monitoring...")
     
-    while monitoring_active:
+    while not _stop_event.wait(timeout=3600):
         try:
             orch = get_orchestrator()
             alerts = orch.monitor_all_farmers()
@@ -130,8 +130,6 @@ def background_monitoring():
                 print(f"[Background] Generated {len(alerts)} alerts")
                 for alert in alerts:
                     print(f"  - Alert for {alert.payload.get('farmer_id')}: {alert.content}")
-            
-            time.sleep(3600)  # Check every hour
         except Exception as e:
             print(f"[Background] Error in monitoring: {e}")
 
@@ -182,6 +180,7 @@ async def shutdown_event():
     """Cleanup on shutdown."""
     global monitoring_active
     monitoring_active = False
+    _stop_event.set()
 
 @app.get("/")
 async def root():
