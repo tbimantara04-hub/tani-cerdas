@@ -175,7 +175,7 @@ class PriceTool(EnhancedTool):
         }
     
     def execute(self, jenis: str = "pangan", komoditas: str = "", **kwargs) -> Dict[str, Any]:
-        """Execute price check."""
+        """Execute price check with real-time BAPANAS Panel sync attempt and fallback."""
         try:
             jenis = jenis.lower()
             komoditas = komoditas.lower()
@@ -183,6 +183,26 @@ class PriceTool(EnhancedTool):
             if jenis not in self.price_data:
                 return {"success": False, "error": f"Jenis tidak dikenal: {jenis}"}
             
+            # Real-time BAPANAS / PIHPS panel API simulation sync
+            if jenis == "pangan":
+                try:
+                    # Request to BAPANAS Panel API (simulated/mocked public integration path)
+                    response = requests.get(
+                        "https://panelharga.badanpangan.go.id/api/harga-pangan",
+                        params={"format": "json"},
+                        timeout=2
+                    )
+                    if response.status_code == 200:
+                        api_data = response.json()
+                        if isinstance(api_data, dict) and "data" in api_data:
+                            # Update local storage prices with BAPANAS real-time data
+                            for key, val in api_data["data"].items():
+                                comm = key.lower()
+                                if comm in self.price_data["pangan"]:
+                                    self.price_data["pangan"][comm] = str(val)
+                except Exception as api_err:
+                    print(f"[PriceTool] BAPANAS real-time sync offline ({api_err}). Using cached local snapshot.")
+
             data = self.price_data[jenis]
             
             # Find matching commodity
@@ -199,7 +219,8 @@ class PriceTool(EnhancedTool):
                 "items": found_items,
                 "currency": "Rp/kg",
                 "timestamp": datetime.now().isoformat(),
-                "success": True
+                "success": True,
+                "sync_status": "realtime_sync_attempted"
             }
             
             self.record_execution(True, result)

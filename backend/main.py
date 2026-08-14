@@ -48,7 +48,8 @@ def load_decrypted_data(file_path):
     decrypted_json = encryptor.decrypt(encrypted_data)
     try:
         return json.loads(decrypted_json)
-    except:
+    except json.JSONDecodeError as e:
+        print(f"[Storage] JSON decode error: {e}")
         return []
 
 class ChatRequest(BaseModel):

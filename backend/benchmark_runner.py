@@ -109,7 +109,7 @@ def main():
         with open(results_path, "r", encoding="utf8") as f:
             try:
                 results = json.load(f)
-            except:
+            except json.JSONDecodeError:
                 results = []
 
     start_idx = len(results)

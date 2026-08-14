@@ -74,8 +74,14 @@ def load_decrypted_data(file_path):
         
     try:
         decrypted_json = encryptor.decrypt(encrypted_data)
+    except Exception as e:
+        print(f"[Storage] Decryption failed: {e}")
+        return []
+
+    try:
         return json.loads(decrypted_json)
-    except:
+    except json.JSONDecodeError as e:
+        print(f"[Storage] JSON decode error: {e}")
         return []
 
 def load_farmer_profile(farmer_id: str = "default"):
