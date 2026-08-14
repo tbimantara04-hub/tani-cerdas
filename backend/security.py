@@ -18,7 +18,12 @@ class EncryptionManager:
         if isinstance(self.key, str):
             self.key = self.key.encode()
             
-        self.cipher_suite = Fernet(self.key)
+        try:
+            self.cipher_suite = Fernet(self.key)
+        except (ValueError, TypeError) as e:
+            print(f"WARNING: Invalid ENCRYPTION_KEY format ({e}). Generating a temporary fallback key.")
+            self.key = Fernet.generate_key()
+            self.cipher_suite = Fernet(self.key)
 
     def encrypt(self, plain_text: str) -> str:
         """Enkripsi teks biasa menjadi token terenkripsi (AES-256/Fernet)."""

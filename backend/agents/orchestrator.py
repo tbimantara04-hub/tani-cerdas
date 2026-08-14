@@ -106,11 +106,35 @@ class AgentOrchestrator:
         }
     
     def _determine_relevant_agents(self, query: str) -> List[str]:
-        """Determine which agents are relevant for a query."""
+        """Determine which agents are relevant for a query using LLM zero-shot classification."""
+        try:
+            from rag_logic import get_llm
+            from langchain_core.messages import HumanMessage
+            
+            llm = get_llm("local")
+            prompt = (
+                f"Tentukan agen mana saja yang paling relevan (pilih 1 sampai 3 agen) dari daftar berikut:\n"
+                f"- weather: untuk cuaca, iklim, hujan, suhu, angin\n"
+                f"- price: untuk harga komoditas pangan, pasar, pupuk, benih\n"
+                f"- farm: untuk jadwal tanam, luas lahan, rencana budidaya, penanaman\n"
+                f"- knowledge: untuk hama, penyakit, pestisida, panduan bertani, obat\n"
+                f"- advisory: untuk saran strategis, analisis proaktif, rekomendasi personal\n\n"
+                f"Pertanyaan pengguna: \"{query}\"\n\n"
+                f"Aturan: Jawab HANYA dengan nama-nama agen yang relevan dipisahkan dengan koma, tanpa tambahan penjelasan apa pun (contoh: \"weather, farm\"):"
+            )
+            
+            res = llm.invoke([HumanMessage(content=prompt)])
+            content = res.content.strip().lower() if hasattr(res, "content") else str(res).strip().lower()
+            
+            selected_agents = [a.strip() for a in content.split(",") if a.strip() in self.agents]
+            if selected_agents:
+                return selected_agents
+        except Exception as e:
+            print(f"[Orchestrator] LLM agent determination failed ({e}). Falling back to keywords.")
+            
+        # Fallback to keyword scoring
         query_lower = query.lower()
         agent_scores = {}
-        
-        # Score each agent based on keyword matches
         keywords_map = {
             "weather": ["cuaca", "weather", "hujan", "panas", "dingin", "angin", "iklim"],
             "price": ["harga", "price", "jual", "beli", "pasar", "market", "pupuk", "benih"],
@@ -124,14 +148,10 @@ class AgentOrchestrator:
             if score > 0:
                 agent_scores[agent] = score
         
-        # Sort by score (descending) and return
         sorted_agents = sorted(agent_scores.items(), key=lambda x: x[1], reverse=True)
-        
         if not sorted_agents:
-            # Default to knowledge agent if no clear match
             return ["knowledge"]
         
-        # Return top 3 relevant agents (limit to avoid overloading)
         return [agent for agent, score in sorted_agents[:3]]
     
     def _aggregate_responses(self, query: str, responses: Dict[str, str], context: Dict[str, Any]) -> str:

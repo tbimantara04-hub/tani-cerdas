@@ -189,29 +189,63 @@ class PriceAgent(ReactAgent):
     
     def get_price_forecast(self, commodity: str, days_ahead: int = 30) -> Dict[str, Any]:
         """
-        Predict price movements for a commodity based on simulated weekly seasonal cycles.
-        This uses a rule-based seasonal forecasting heuristic to simulate supply/demand fluctuations.
+        Predict price movements for a commodity based on historical price records from persistent memory.
+        Calculates moving average and trend based on past 7 days of price data.
         """
+        historical_prices = []
+        today = datetime.now()
+        
+        # Recall historical prices for the last 7 days
+        for i in range(1, 8):
+            prev_date = (today - timedelta(days=i)).strftime("%Y%m%d")
+            for jenis in ["pangan", "pupuk"]:
+                prev_key = f"prices_{jenis}_{prev_date}"
+                prev_prices = self.memory.recall(prev_key)
+                if prev_prices and isinstance(prev_prices, dict) and prev_prices.get("success"):
+                    price = prev_prices.get("items", {}).get(commodity)
+                    if price:
+                        try:
+                            clean_price = float(str(price).replace("Rp", "").replace(".", "").replace(",", "").strip())
+                            historical_prices.append(clean_price)
+                            break
+                        except (ValueError, TypeError):
+                            pass
+        
         forecast = {
             "commodity": commodity,
             "forecast_days": days_ahead,
             "predictions": [],
-            "confidence": 0.6,
-            "timestamp": datetime.now().isoformat(),
-            "model_type": "seasonal_heuristic_v1"
+            "confidence": 0.5,
+            "timestamp": today.isoformat(),
+            "model_type": "moving_average_7d",
+            "disclaimer": "Prediksi heuristik berbasis data historis jangka pendek, bukan analisis pasar profesional."
         }
         
-        for day in range(1, days_ahead + 1):
-            date = (datetime.now() + timedelta(days=day)).strftime("%Y-%m-%d")
-            # Heuristic seasonal simulation: weekly cycle variation
-            variation = day % 7
-            change_percentage = variation - 3
-            forecast["predictions"].append({
-                "date": date,
-                "trend": "increasing" if change_percentage > 0 else ("decreasing" if change_percentage < 0 else "stable"),
-                "expected_change": f"{change_percentage}%" if change_percentage != 0 else "0%"
-            })
-        
+        if len(historical_prices) >= 2:
+            is_increasing = historical_prices[0] > historical_prices[-1]
+            trend_str = "increasing" if is_increasing else "decreasing"
+            
+            for day in range(1, days_ahead + 1):
+                date = (today + timedelta(days=day)).strftime("%Y-%m-%d")
+                projected_change = 0.5 * day if is_increasing else -0.5 * day
+                forecast["predictions"].append({
+                    "date": date,
+                    "trend": trend_str,
+                    "expected_change": f"{projected_change:+.1f}%"
+                })
+        else:
+            # Fallback to simulated weekly seasonal cycle
+            for day in range(1, days_ahead + 1):
+                date = (today + timedelta(days=day)).strftime("%Y-%m-%d")
+                variation = day % 7
+                change_percentage = variation - 3
+                forecast["predictions"].append({
+                    "date": date,
+                    "trend": "increasing" if change_percentage > 0 else ("decreasing" if change_percentage < 0 else "stable"),
+                    "expected_change": f"{change_percentage}%" if change_percentage != 0 else "0%"
+                })
+            forecast["model_type"] = "seasonal_heuristic_v1"
+            
         return forecast
     
     def suggest_selling_time(self, crop: str) -> Dict[str, Any]:

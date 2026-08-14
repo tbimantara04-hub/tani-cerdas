@@ -27,5 +27,8 @@ dist-ssr
 backend/venv/
 __pycache__/
 .env
+backend/.env
+*.env
+!.env.example
 storage/
 tani-cerdas-main/

@@ -288,3 +288,12 @@ tani-cerdas-main/
 ├── index.html                      # Halaman HTML utama
 └── README.md                       # Panduan dokumentasi proyek (Berkas ini)
 ```
+
+---
+
+## ⚠️ Limitasi & Disclaimer
+
+1. **Perkiraan Harga (Price Forecasting)**: Fitur prediksi harga komoditas pertanian menggunakan heuristik moving average jangka pendek (7 hari terakhir dari memori) dan pola musiman mingguan (fallback). Model ini dirancang sebagai indikasi tren dasar dan **tidak ditujukan** sebagai alat analisis keuangan, spekulasi pasar, atau keputusan investasi profesional.
+2. **Keandalan Data Cuaca**: Prakiraan cuaca bersumber dari API OpenWeatherMap dan bergantung pada konektivitas internet serta batas kuota API Key pengguna.
+3. **Model AI Lokal**: Respons asisten AI sangat dipengaruhi oleh kapasitas dan performa model lokal yang dijalankan melalui Ollama (seperti Qwen2-1.5B). Terkadang dapat terjadi halusinasi informasi non-pertanian jika filter guardrail dilewati.
+

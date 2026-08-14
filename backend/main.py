@@ -106,7 +106,7 @@ class PlantingRecord(BaseModel):
 def save_planting(record: PlantingRecord):
     try:
         records = load_decrypted_data(PLANTING_FILE)
-        new_record = record.dict()
+        new_record = record.model_dump()
         if not new_record["date"]:
             new_record["date"] = datetime.now().strftime("%Y-%m-%d")
         
