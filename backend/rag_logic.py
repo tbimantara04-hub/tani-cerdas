@@ -14,7 +14,7 @@ import time
 import requests
 import threading
 from dotenv import load_dotenv
-from security import encryptor
+from security import encryptor, verify_faiss_checksum, write_faiss_checksum
 
 # ── LangChain imports ────────────────────────────────────────────────────────
 from langchain_core.tools import tool
@@ -80,7 +80,7 @@ DB_FAISS_PATH = os.path.join(BASE_DIR, "vectorstore", "db_faiss_local")
 
 def get_retriever():
     """Inisialisasi atau muat FAISS retriever lokal."""
-    if not os.path.exists(DB_FAISS_PATH):
+    if not os.path.exists(DB_FAISS_PATH) or not verify_faiss_checksum(DB_FAISS_PATH):
         docs_all = []
         
         # Load PDF
@@ -102,6 +102,7 @@ def get_retriever():
         texts = splitter.split_documents(docs_all)
         db = FAISS.from_documents(texts, embeddings)
         db.save_local(DB_FAISS_PATH)
+        write_faiss_checksum(DB_FAISS_PATH)
     else:
         db = FAISS.load_local(DB_FAISS_PATH, embeddings, allow_dangerous_deserialization=True)
     return db.as_retriever(search_kwargs={"k": 5})
@@ -152,7 +153,12 @@ def cek_cuaca(lokasi: str = "") -> str:
             kondisi = data['weather'][0]['description']
             return f"Cuaca di {lokasi}: {kondisi}, suhu {suhu}°C."
         return "Data cuaca API sibuk."
-    except: return "Gagal cek cuaca."
+    except requests.RequestException as e:
+        print(f"[Weather API Error] {e}")
+        return "Gagal cek cuaca karena masalah jaringan."
+    except Exception as e:
+        print(f"[Weather Error] {e}")
+        return "Gagal cek cuaca."
 
 def lihat_profil_petani() -> str:
     """Baca profil dari storage."""
@@ -163,7 +169,9 @@ def lihat_profil_petani() -> str:
             data = encryptor.decrypt(f.read())
             p = json.loads(data)
             return f"Profil: {p['tanaman']} di {p['lokasi']} ({p['luas_lahan']})"
-    except: return "Gagal baca profil."
+    except Exception as e:
+        print(f"[Profile Read Error] {e}")
+        return "Gagal baca profil."
 
 def simpan_profil_petani(tanaman: str, luas_lahan: str, lokasi: str = "") -> str:
     """Simpan profil ke storage."""
@@ -173,7 +181,9 @@ def simpan_profil_petani(tanaman: str, luas_lahan: str, lokasi: str = "") -> str
         with open("storage/farmer_profile.json", "w") as f:
             f.write(encryptor.encrypt(json.dumps(p)))
         return "Profil berhasil disimpan."
-    except: return "Gagal simpan profil."
+    except Exception as e:
+        print(f"[Profile Save Error] {e}")
+        return "Gagal simpan profil."
 
 # Dispatcher untuk mempermudah pemanggilan manual
 TOOL_DISPATCHER = {
@@ -272,7 +282,9 @@ def ambil_profil_petani():
     try:
         with open(PROFILE_FILE, "r") as f:
             return json.loads(encryptor.decrypt(f.read()))
-    except: return None
+    except Exception as e:
+        print(f"[Get Profile Error] {e}")
+        return None
 
 llm_final = RunnableLambda(lambda x: ask_chatbot(x.to_string() if hasattr(x, "to_string") else str(x), "local")[0])
 

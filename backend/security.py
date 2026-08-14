@@ -45,3 +45,54 @@ class EncryptionManager:
 
 # Singleton instance
 encryptor = EncryptionManager()
+
+
+# ── FAISS Integrity Validation Checksums ─────────────────────────────────────
+import hashlib
+
+def calculate_file_hash(filepath: str) -> str:
+    """Menghitung hash SHA256 dari sebuah berkas."""
+    hasher = hashlib.sha256()
+    try:
+        with open(filepath, 'rb') as f:
+            while chunk := f.read(8192):
+                hasher.update(chunk)
+        return hasher.hexdigest()
+    except FileNotFoundError:
+        return ""
+
+def write_faiss_checksum(db_path: str):
+    """Menulis checksum SHA256 untuk index.faiss dan index.pkl."""
+    index_faiss_path = os.path.join(db_path, "index.faiss")
+    index_pkl_path = os.path.join(db_path, "index.pkl")
+    hash_faiss = calculate_file_hash(index_faiss_path)
+    hash_pkl = calculate_file_hash(index_pkl_path)
+    
+    checksum_path = os.path.join(db_path, "index.sha256")
+    os.makedirs(db_path, exist_ok=True)
+    with open(checksum_path, "w") as f:
+        f.write(f"{hash_faiss}\n{hash_pkl}")
+
+def verify_faiss_checksum(db_path: str) -> bool:
+    """Memverifikasi kecocokan checksum SHA256 sebelum deserialisasi."""
+    index_faiss_path = os.path.join(db_path, "index.faiss")
+    index_pkl_path = os.path.join(db_path, "index.pkl")
+    checksum_path = os.path.join(db_path, "index.sha256")
+    
+    if not os.path.exists(checksum_path):
+        return False
+        
+    try:
+        with open(checksum_path, "r") as f:
+            lines = f.read().splitlines()
+        if len(lines) < 2:
+            return False
+        expected_hash_faiss, expected_hash_pkl = lines[0], lines[1]
+        
+        actual_hash_faiss = calculate_file_hash(index_faiss_path)
+        actual_hash_pkl = calculate_file_hash(index_pkl_path)
+        
+        return (actual_hash_faiss == expected_hash_faiss) and (actual_hash_pkl == expected_hash_pkl)
+    except Exception as e:
+        print(f"[FAISS Integrity] Error verifying checksum: {e}")
+        return False

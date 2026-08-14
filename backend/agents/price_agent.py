@@ -121,32 +121,52 @@ class PriceAgent(ReactAgent):
         return response
     
     def _analyze_trends(self, jenis: str, items: Dict[str, str]) -> list[str]:
-        """Analyze price trends."""
+        """
+        Analyze price trends using historical price records from the persistent memory.
+        Calculates percentage changes and gives actionable trend warnings.
+        """
         trends = []
         
         # Get historical data
-        today = datetime.now().strftime("%Y%m%d")
-        current_key = f"prices_{jenis}_{today}"
-        current_prices = self.memory.recall(current_key)
+        today = datetime.now()
+        found_historical = False
         
-        if current_prices:
-            # Compare with previous days
-            for i in range(1, 8):
-                prev_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
-                prev_key = f"prices_{jenis}_{prev_date}"
-                prev_prices = self.memory.recall(prev_key)
+        # Compare with yesterday or recent days (up to 7 days ago)
+        for i in range(1, 8):
+            prev_date = (today - timedelta(days=i)).strftime("%Y%m%d")
+            prev_key = f"prices_{jenis}_{prev_date}"
+            prev_prices = self.memory.recall(prev_key)
+            
+            if prev_prices and isinstance(prev_prices, dict) and prev_prices.get("success"):
+                prev_items = prev_prices.get("items", {})
+                found_historical = True
+                trends.append(f"Perbandingan tren harga dengan {i} hari lalu ({prev_date}):")
                 
-                if prev_prices:
-                    # Simple trend comparison
-                    if jenis == "pangan":
-                        trends.append(f"Data historis tersedia untuk analisis 7 hari")
-                    break
-        
+                for item, current_val in items.items():
+                    if item in prev_items:
+                        try:
+                            curr_price = float(current_val)
+                            prev_price = float(prev_items[item])
+                            if prev_price > 0:
+                                pct_change = ((curr_price - prev_price) / prev_price) * 100
+                                if pct_change > 0:
+                                    trends.append(f"• {item.title()}: naik +{pct_change:.1f}%")
+                                elif pct_change < 0:
+                                    trends.append(f"• {item.title()}: turun {pct_change:.1f}%")
+                                else:
+                                    trends.append(f"• {item.title()}: stabil (tidak ada perubahan)")
+                        except (ValueError, TypeError):
+                            pass
+                break
+                
+        if not found_historical:
+            trends.append("Belum ada data historis di memori untuk perbandingan tren jangka pendek.")
+            
         # Generic trend analysis
         if jenis == "pangan":
-            trends.append("Pantau harga pangan secara rutin untuk keputusan panen optimal")
+            trends.append("Amati fluktuasi mingguan untuk menentukan waktu penjualan yang paling optimal.")
         else:
-            trends.append("Harga pupuk subsidi relatif stabil sepanjang tahun")
+            trends.append("Harga pupuk subsidi diatur HET pemerintah sehingga cenderung stabil.")
         
         return trends
     
@@ -168,24 +188,28 @@ class PriceAgent(ReactAgent):
         return recommendations
     
     def get_price_forecast(self, commodity: str, days_ahead: int = 30) -> Dict[str, Any]:
-        """Predict price movements for a commodity."""
-        # Simplified forecast based on seasonal patterns
+        """
+        Predict price movements for a commodity based on simulated weekly seasonal cycles.
+        This uses a rule-based seasonal forecasting heuristic to simulate supply/demand fluctuations.
+        """
         forecast = {
             "commodity": commodity,
             "forecast_days": days_ahead,
             "predictions": [],
             "confidence": 0.6,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "model_type": "seasonal_heuristic_v1"
         }
         
         for day in range(1, days_ahead + 1):
             date = (datetime.now() + timedelta(days=day)).strftime("%Y-%m-%d")
-            # Simplified: slight variation
-            variation = day % 7  # Weekly pattern
+            # Heuristic seasonal simulation: weekly cycle variation
+            variation = day % 7
+            change_percentage = variation - 3
             forecast["predictions"].append({
                 "date": date,
-                "trend": "stable",
-                "expected_change": f"{variation - 3}%" if variation != 0 else "0%"
+                "trend": "increasing" if change_percentage > 0 else ("decreasing" if change_percentage < 0 else "stable"),
+                "expected_change": f"{change_percentage}%" if change_percentage != 0 else "0%"
             })
         
         return forecast

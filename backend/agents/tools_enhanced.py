@@ -227,11 +227,13 @@ class RAGTool(EnhancedTool):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         db_path = os.path.join(base_dir, "..", "vectorstore", "db_faiss_local")
         
-        if os.path.exists(db_path):
+        from security import verify_faiss_checksum
+        if os.path.exists(db_path) and verify_faiss_checksum(db_path):
             try:
                 db = FAISS.load_local(db_path, self.embeddings, allow_dangerous_deserialization=True)
                 self.retriever = db.as_retriever(search_kwargs={"k": 5})
-            except:
+            except Exception as e:
+                print(f"[RAG Init Error] Failed to load local FAISS index: {e}. Rebuilding...")
                 self._build_retriever(base_dir)
         else:
             self._build_retriever(base_dir)
@@ -245,29 +247,32 @@ class RAGTool(EnhancedTool):
         for pdf_file in glob.glob(os.path.join(data_dir, "*.pdf")):
             try:
                 docs_all.extend(PyPDFLoader(pdf_file).load())
-            except:
-                pass
+            except Exception as e:
+                print(f"[PDF Load Error] Failed to load {pdf_file}: {e}")
         
         # Load DOCX
         for docx_file in glob.glob(os.path.join(data_dir, "*.docx")):
             try:
                 docs_all.extend(Docx2txtLoader(docx_file).load())
-            except:
-                pass
+            except Exception as e:
+                print(f"[DOCX Load Error] Failed to load {docx_file}: {e}")
         
         # Fallback to root
         if not docs_all:
             for pdf_file in glob.glob(os.path.join(base_dir, "..", "*.pdf")):
                 try:
                     docs_all.extend(PyPDFLoader(pdf_file).load())
-                except:
-                    pass
+                except Exception as e:
+                    print(f"[Fallback PDF Load Error] Failed to load {pdf_file}: {e}")
         
         if docs_all:
             splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
             texts = splitter.split_documents(docs_all)
             db = FAISS.from_documents(texts, self.embeddings)
-            db.save_local(os.path.join(base_dir, "..", "vectorstore", "db_faiss_local"))
+            db_path = os.path.join(base_dir, "..", "vectorstore", "db_faiss_local")
+            db.save_local(db_path)
+            from security import write_faiss_checksum
+            write_faiss_checksum(db_path)
             self.retriever = db.as_retriever(search_kwargs={"k": 5})
     
     def plan_execution(self, params: Dict[str, Any]) -> Dict[str, Any]:

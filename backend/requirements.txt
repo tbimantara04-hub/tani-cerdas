@@ -11,4 +11,5 @@ google-generativeai
 cryptography==42.0.5
 openai
 langchain-openai
+docx2txt>=0.8
 
